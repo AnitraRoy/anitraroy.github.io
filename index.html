@@ -1,10 +1,339 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Welcome to My GitHub Page</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Anitra Roy | Portfolio</title>
+  <link rel="stylesheet" href="styles/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <h1>Hello, I’m Anitra!</h1>
-  <p>This is my personal GitHub Page.</p>
+  <!-- particle background -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- navbar -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <span class="logo">anitraroy</span>
+    </div>
+    <div class="nav-center">
+      <div class="nav-links">
+        <a href="#home" class="active">Home</a>
+        <a href="#about">About</a>
+        <a href="#education">Education</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Projects</a>
+        <!--<a href="#contact">Contact</a>--->
+      </div>
+    </div>
+    <div class="nav-right"></div>
+  </nav>
+
+  <!-- theme toggle button -->
+  <button id="theme-toggle" class="floating-toggle">
+    <img id="theme-icon-btn" src="images/icons/moon.svg" alt="Toggle Theme" />
+  </button>
+
+  <!-- hero section -->
+  <div id="home"></div>
+  <section id="hero" class="center">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Anitra Roy</h1>
+        <p class="subtitle"><span id="typed"></span></p>
+      </div>
+      <div class="hero-image">
+        <a href="https://linkedin.com/in/AnitraRoy" target="_blank" rel="noopener noreferrer">
+          <img src="images/portrait.jpeg" alt="Portrait" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-separator" />
+
+  <!-- about me section -->
+  <section id="about">
+    <h2 class="section-title">About Me</h2>
+    <div class="hero-content about-content fade-in">
+      <div class="hero-image carousel">
+        <img src="images/about.png" alt="About Me" class="carousel-image active" />
+        <img src="images/about2.png" alt="About Me" class="carousel-image" />
+        <img src="images/about3.png" alt="About Me" class="carousel-image" />
+      </div>
+      <div class="hero-text">
+        <p>
+          I am an Industrial Engineer passionate about leveraging data and optimization techniques 
+          to solve complex problems. I specialize in process optimization, operations research, 
+          and data-driven decision-making. I enjoy designing scalable solutions that combine 
+          analytical rigor with practical application.
+        </p>
+        <p><strong>Skills:</strong> Python, SQL, Java, Excel</p>
+        <p><strong>Interests:</strong> Data Science, Machine Learning, Sustainable Systems</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-separator" />
+
+  <!-- education section -->
+  <section id="education">
+    <h2 class="section-title">Education</h2>
+    <div class="stack multi-column">
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <img
+            class="theme-icon"
+            data-dark="images/logos/uoft-dark.png"
+            data-light="images/logos/uoft.png"
+            src="images/logos/uoft-dark.png"
+            alt="University of Toronto Logo"
+          />
+        </div>
+        <div class="card-text">
+          <h3>University of Toronto</h3>
+          <div class="position-date">BASc., Industrial Engineering | Sep 2022 — Present</div>
+          <p>Minors: Artificial Intelligence & Engineering Business</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-separator" />
+
+  <!-- experience section -->
+  <section id="experience">
+    <h2 class="section-title">Experience</h2>
+    <div class="stack multi-column">
+
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <img
+            class="theme-icon"
+            data-dark="images/logos/uhn-dark.png"
+            data-light="images/logos/uhn.png"
+            src="images/logos/uhn-dark.png"
+            alt="University Health Network Logo"
+          />
+        </div>
+        <div class="card-text">
+          <h3>University Health Network</h3>
+          <div class="position-date">Junior Data Engineer | May 2025 — Present</div>
+          <ul class="experience-bullets">
+            <li>Working with the Kidney Health Education and Research Group (KHERG).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <img
+            class="theme-icon"
+            data-dark="images/logos/iit-dark.png"
+            data-light="images/logos/iit.png"
+            src="images/logos/iit-dark.png"
+            alt="IIT Kharagpur Logo"
+          />
+        </div>
+        <div class="card-text">
+          <h3>Indian Institute of Technology, Kharagpur</h3>
+          <div class="position-date">Student Researcher | May 2024 — Aug 2025</div>
+          <ul class="experience-bullets">
+            <li>Worked under the supervision of Prof. Mamata Jenamani and Dr. Biswajit Kar.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <img
+            class="theme-icon"
+            data-dark="images/logos/uo-dark.png"
+            data-light="images/logos/uo.png"
+            src="images/logos/uo-dark.png"
+            alt="University of Ottawa Logo"
+          />
+        </div>
+        <div class="card-text">
+          <h3>Telfer School of Management, University of Ottawa</h3>
+          <div class="position-date">Undergraduate Research Assistant | May 2023 — Aug 2023</div>
+          <ul class="experience-bullets">
+            <li>Worked under the supervision of Prof. Shantanu Dutta.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="section-separator" />
+
+  <!-- projects section -->
+  <section id="projects">
+    <h2 class="section-title">Projects</h2>
+    <div class="stack multi-column">
+
+      <!-- project 1 -->
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <a href="https://github.com/AnitraRoy/EyeDentify" target="_blank" rel="noopener noreferrer">
+            <img src="images/projects/project1.jpg" alt="Project One Img" />
+          </a>
+        </div>
+        <div class="card-text">
+          <h3>
+            <a href="https://github.com/AnitraRoy/EyeDentify" target="_blank" rel="noopener noreferrer">
+              EyeDentify: Retinal Disease Detection Using Deep Learning
+            </a>
+          </h3>
+          <div class="position-date">Jun 2025 — Aug 2025</div>
+          <ul class="project-bullets">
+            <li>Built a baseline SVM classifier and multiple CNN models (AlexNet, ResNet, VGG) on 12,000+ OCT retinal scans, achieving a multi-class classification accuracy of 91%.</li>
+            <li>Utilized CUDA acceleration to speed up training and performed extensive hyperparameter tuning, reducing training time by 78% while optimizing model performance.</li>
+            <li>Evaluated models using accuracy, ROC-AUC, and confusion matrices to ensure scalable multi-class classification for retinal disease diagnosis.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- project 2 -->
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <a href="https://github.com/AbderazakHsaini/TouristItinerary" target="_blank" rel="noopener noreferrer">
+            <img src="images/projects/project2.png" alt="Project Two Img" />
+          </a>
+        </div>
+        <div class="card-text">
+          <h3>
+            <a href="https://github.com/AbderazakHsaini/TouristItinerary" target="_blank" rel="noopener noreferrer">
+              Vehicle Routing and Scheduling Optimization for Trip Planning
+            </a>
+          </h3>
+          <div class="position-date">May 2025 — Jun 2025</div>
+          <ul class="project-bullets">
+            <li>Engineered a multi-modal route optimization model using Gurobi MILP and a modified capacitated vehicle routing problem (CVRP), boosting route efficiency while maximizing coverage and minimizing costs across a sample of 10 locations and 5 vehicle types.</li>
+            <li>Designed a flexible optimization framework, adaptable to changing fleet sizes, types, and route conditions, supporting scalable trip planning solutions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- project 3 -->
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <a href="https://github.com/AnitraRoy/Music-and-Text-Familiarity-vs-Typing" target="_blank" rel="noopener noreferrer">
+            <img src="images/projects/project3.jpg" alt="Project Three Img" />
+          </a>
+        </div>
+        <div class="card-text">
+          <h3>
+            <a href="https://github.com/AnitraRoy/Music-and-Text-Familiarity-vs-Typing" target="_blank" rel="noopener noreferrer">
+              Statistical Analysis of Music and Text Familiarity Effects on Typing
+            </a>
+          </h3>
+          <div class="position-date">Feb 2025 — Apr 2025</div>
+          <ul class="project-bullets">
+            <li>Designed and executed a behavioural experiment analyzing how music type and text familiarity affect typing speed and accuracy.</li>
+            <li>Collected and analyzed data from 12 participants, measuring typing performance across 6 trial conditions.</li>
+            <li>Utilized R for data cleaning, visualization, and statistical modelling to assess impacts of music and text familiarity on typing performance using two-way ANOVA.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- project 4 -->
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <a href="https://github.com/AnitraRoy/Shoe-Production-Plan-Optimization" target="_blank" rel="noopener noreferrer">
+            <img src="images/projects/project4.jpg" alt="Project Four Img" />
+          </a>
+        </div>
+        <div class="card-text">
+          <h3>
+            <a href="https://github.com/AnitraRoy/Shoe-Production-Plan-Optimization" target="_blank" rel="noopener noreferrer">
+              Shoe Company Production Plan Optimization
+            </a>
+          </h3>
+          <div class="position-date">Sep 2024 — Dec 2024</div>
+          <ul class="project-bullets">
+            <li>Developed a strategic production plan for a footwear company, integrating insights from demand forecasting, material availability, and equipment capacity.</li>
+            <li>Employed SQL to retrieve data from Microsoft Access and utilized AMPL to develop a program that effectively calculated optimal production volumes for all product lines, maximizing resource utilization.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- project 5 -->
+      <div class="h-card horizontal fade-in">
+        <div class="card-logo">
+          <a href="https://github.com/AnitraRoy/Battery-Electric-Bus-System-Optimization" target="_blank" rel="noopener noreferrer">
+            <img src="images/projects/project5.jpg" alt="Project Five Img" />
+          </a>
+        </div>
+        <div class="card-text">
+          <h3>
+            <a href="https://github.com/AnitraRoy/Battery-Electric-Bus-System-Optimization" target="_blank" rel="noopener noreferrer">
+              Predictive Modeling and Cost Optimization for Electric Bus Systems
+            </a>
+          </h3>
+          <div class="position-date">May 2024 — Aug 2024</div>
+          <ul class="project-bullets">
+            <li>Developed a Gurobi MILP model to optimize 18 electric bus routes in New Delhi, minimizing fuel consumption and operational costs by 4%.</li>
+            <li>Recommended a 70% increase in depot chargers, based on model outcomes, leading to better fleet charging distribution and reduced waiting time.</li>
+            <li>Employed historical data analysis and predictive modeling to forecast energy demand and system usage patterns, improving decision-making.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="section-separator" />
+
+  <!-- contact section -->
+  <!--
+  <section id="contact">
+    <h2 class="section-title">Contact</h2>
+    <div class="box contact-box fade-in">
+      <form id="contact-form">
+        <label>Name <input type="text" required /></label>
+        <label>Email <input type="email" required /></label>
+        <label>Message <textarea required></textarea></label>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  </section> --->
+
+  <!-- footer section -->
+  <footer class="footer">
+    <div class="social-links">
+      <a href="https://github.com/AnitraRoy">
+        <img
+          class="theme-icon"
+          data-dark="images/icons/github-light.svg"
+          data-light="images/icons/github-dark.svg"
+          src="images/icons/github-light.svg"
+          alt="GitHub"
+        />
+      </a>
+      <a href="https://linkedin.com/in/AnitraRoy">
+        <img
+          class="theme-icon"
+          data-dark="images/icons/linkedin.svg"
+          data-light="images/icons/linkedin.svg"
+          src="images/icons/linkedin.svg"
+          alt="LinkedIn"
+        />
+      </a>
+      <a href="mailto:royanitra04@gmail.com">
+        <img
+          class="theme-icon"
+          data-dark="images/icons/gmail.svg"
+          data-light="images/icons/gmail.svg"
+          src="images/icons/gmail.svg"
+          alt="Email"
+        />
+      </a>
+    </div>
+    <p>© 2026 Anitra Roy. All rights reserved.</p>
+  </footer>
+
+  <script src="scripts/main.js"></script>
 </body>
 </html>
