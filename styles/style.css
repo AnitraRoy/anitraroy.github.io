@@ -476,3 +476,14 @@ body.light .contact-box {
   .multi-column .h-card { max-width: 100%; }
   .nav-links { max-width: 100%; }
 }
+
+/* top left link to github */
+.logo {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo:hover {
+  color: #ccc;
+}

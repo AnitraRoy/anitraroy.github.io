@@ -47,7 +47,7 @@ function typeWriter() {
       i = (i + 1) % words.length;
     }
   }
-  setTimeout(typeWriter, 180);
+  setTimeout(typeWriter, 150);
 }
 typeWriter();
 
@@ -150,7 +150,7 @@ function coolScrollTo(targetY, duration = 900) {
 const canvas = document.getElementById("particle-canvas");
 const ctx = canvas.getContext("2d");
 let particles = [];
-const maxParticles = 75;
+const maxParticles = 85;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -165,8 +165,8 @@ class Particle {
     this.x = Math.random() * canvas.width;
     this.y = Math.random() * canvas.height;
     this.size = 1 + Math.random() * 2;
-    this.speedX = (Math.random() - 0.5) * 0.4;
-    this.speedY = (Math.random() - 0.5) * 0.4;
+    this.speedX = (Math.random() - 0.5) * 0.5;
+    this.speedY = (Math.random() - 0.5) * 0.5;
     this.opacity = 0.1 + Math.random() * 0.5;
   }
   update() {
