@@ -1,222 +1,244 @@
-// theme toggle with icons
-const toggleBtn = document.getElementById("theme-toggle");
-const toggleIcon = document.getElementById("theme-icon-btn");
-const themeIcons = document.querySelectorAll(".theme-icon");
+// -- Theme toggle --
+const themeBtn = document.getElementById('theme-toggle');
 
-// initialize theme from localStorage
-if(localStorage.getItem("theme") === "light") {
-  document.body.classList.add("light");
-  toggleIcon.src = "images/icons/moon.svg"; 
-} else {
-  toggleIcon.src = "images/icons/sun.svg"; 
+function isLight() {
+  return document.documentElement.classList.contains('light');
 }
 
-// update footer icons based on theme
-function updateIcons() {
-  const isLight = document.body.classList.contains("light");
-  themeIcons.forEach(icon => {
-    icon.src = isLight ? icon.dataset.light : icon.dataset.dark;
+function setTheme(light) {
+  document.documentElement.classList.toggle('light', light);
+  localStorage.setItem('theme', light ? 'light' : 'dark');
+  updateLogoIcons();
+  // Trigger dot color re-read
+  readDotColor();
+  if (!rafRunning) drawDots();
+}
+
+themeBtn.addEventListener('click', () => setTheme(!isLight()));
+
+// -- Theme-aware logo images --
+function updateLogoIcons() {
+  const light = isLight();
+  document.querySelectorAll('.theme-aware-logo').forEach(img => {
+    img.src = light ? img.dataset.light : img.dataset.dark;
   });
 }
-updateIcons();
+// Run on load
+updateLogoIcons();
 
-// toggle theme with icon swap
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  const isLight = document.body.classList.contains("light");
-  localStorage.setItem("theme", isLight ? "light" : "dark");
-  toggleIcon.src = isLight ? "images/icons/moon.svg" : "images/icons/sun.svg";
-  updateIcons();
-});
+// -- Nav active link highlighting on scroll --
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-link');
 
-// hero typing effect
-const typedElement = document.getElementById("typed");
-const words = ["Industrial Engineer","Process Optimizer","Operations Analyst","Systems Thinker","Data-Driven Problem Solver"];
-let i = 0, j = 0, forward = true;
-
-function typeWriter() {
-  if (forward) {
-    typedElement.textContent = words[i].slice(0, j + 1);
-    j++;
-    if (j > words[i].length) forward = false;
-  } else {
-    typedElement.textContent = words[i].slice(0, j - 1);
-    j--;
-    if (j === 0) {
-      forward = true;
-      i = (i + 1) % words.length;
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.getAttribute('id');
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+      });
     }
-  }
-  setTimeout(typeWriter, 150);
-}
-typeWriter();
-
-// image carousel
-window.addEventListener("DOMContentLoaded", () => {
-  const carouselImages = document.querySelectorAll('.carousel-image');
-  let currentIndex = 0;
-
-  function showImage(index) {
-    carouselImages.forEach((img, i) => {
-      img.classList.toggle('active', i === index);
-    });
-    currentIndex = index;
-  }
-
-  function showNextImage() {
-    const nextIndex = (currentIndex + 1) % carouselImages.length;
-    showImage(nextIndex);
-  }
-
-  setInterval(showNextImage, 3500);
-
-  carouselImages.forEach(img => {
-    img.addEventListener('click', showNextImage);
   });
-});
+}, { rootMargin: '-40% 0px -55% 0px' });
 
-// smooth scroll and active nav highlighting
-const sections = document.querySelectorAll("section");
-const navLinks = document.querySelectorAll(".nav-links a");
+sections.forEach(s => sectionObserver.observe(s));
 
-window.addEventListener("scroll", () => {
-  let current = "";
-  sections.forEach(section => {
-    const sectionTop = section.offsetTop - 80;
-    if (pageYOffset >= sectionTop) current = section.getAttribute("id");
-  });
-  navLinks.forEach(link => link.classList.remove("active"));
-  navLinks.forEach(link => {
-    if (link.getAttribute("href") === "#" + current) link.classList.add("active");
-  });
-});
-
-// hide navbar on scroll down, show on scroll up
-let lastScrollY = window.scrollY;
-const navbar = document.querySelector(".navbar");
-const scrollThreshold = 10; // minimum pixels to trigger hide/show
-let ignoreScroll = false;
-
-// disable hide/show briefly after clicking nav link
-document.querySelectorAll(".nav-links a").forEach(link => {
-  link.addEventListener("click", (e) => {
+// Smooth scroll on nav link click
+navLinks.forEach(link => {
+  link.addEventListener('click', e => {
     e.preventDefault();
-    const sectionID = link.getAttribute("href");
-    const target = document.querySelector(sectionID);
-    const offset = 90; // navbar height
-    const targetY = target.offsetTop - offset;
-    coolScrollTo(targetY);
+    const targetId = link.getAttribute('href').slice(1);
+    const target = document.getElementById(targetId);
+    if (target) {
+      const offset = 80;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
   });
 });
 
-window.addEventListener("scroll", () => {
-  if (ignoreScroll) return;
-  const currentY = window.scrollY;
-  if (Math.abs(currentY - lastScrollY) < scrollThreshold) return;
+// -- About photo carousel --
+const carouselImages = document.querySelectorAll('.carousel-image');
+let currentCarouselIndex = 0;
 
-  if (currentY > lastScrollY) {
-    navbar.classList.add("hide"); // scrolling down
-  } else {
-    navbar.classList.remove("hide"); // scrolling up
-  }
-
-  lastScrollY = currentY;
-});
-
-// smooth scroll with easing and soft overshoot
-function coolScrollTo(targetY, duration = 900) {
-  const startY = window.pageYOffset;
-  const diff = targetY - startY;
-  let start;
-
-  function easeOvershoot(t) {
-    const c1 = 1.05; // overshoot strength
-    const c3 = c1 + 1;
-    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-  }
-
-  function step(timestamp) {
-    if (!start) start = timestamp;
-    let time = timestamp - start;
-    let progress = Math.min(time / duration, 1);
-    window.scrollTo(0, startY + diff * easeOvershoot(progress));
-    if (time < duration) requestAnimationFrame(step);
-  }
-
-  requestAnimationFrame(step);
+function advanceCarousel() {
+  carouselImages[currentCarouselIndex].classList.remove('active');
+  currentCarouselIndex = (currentCarouselIndex + 1) % carouselImages.length;
+  carouselImages[currentCarouselIndex].classList.add('active');
 }
 
-// particle background
-const canvas = document.getElementById("particle-canvas");
-const ctx = canvas.getContext("2d");
-let particles = [];
-const maxParticles = 85;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-class Particle {
-  constructor() { this.reset(); }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = 1 + Math.random() * 2;
-    this.speedX = (Math.random() - 0.5) * 0.5;
-    this.speedY = (Math.random() - 0.5) * 0.5;
-    this.opacity = 0.1 + Math.random() * 0.5;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    if (this.x > canvas.width) this.x = 0;
-    if (this.x < 0) this.x = canvas.width;
-    if (this.y > canvas.height) this.y = 0;
-    if (this.y < 0) this.y = canvas.height;
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.fillStyle = document.body.classList.contains("light") ?
-      `rgba(7,16,31,${this.opacity})` :
-      `rgba(245,238,218,${this.opacity})`;
-    ctx.shadowColor = ctx.fillStyle;
-    ctx.shadowBlur = 5;
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
+if (carouselImages.length) {
+  setInterval(advanceCarousel, 3500);
+  document.querySelector('.carousel')?.addEventListener('click', advanceCarousel);
 }
 
-function initParticles() {
-  particles = [];
-  for (let i = 0; i < maxParticles; i++) particles.push(new Particle());
-}
-initParticles();
-
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animateParticles);
-}
-animateParticles();
-
-// scroll reveal for fade-in elements
-const faders = document.querySelectorAll(".fade-in");
-const appearOptions = { threshold: 0.1, rootMargin: "0px 0px -80px 0px" };
-const appearOnScroll = new IntersectionObserver((entries, observer) => {
+// -- Scroll-triggered fade-in --
+const faders = document.querySelectorAll('.fade-in');
+const fadeObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
-    entry.target.classList.add("visible");
-    observer.unobserve(entry.target);
+    entry.target.classList.add('visible');
+    obs.unobserve(entry.target);
   });
-}, appearOptions);
-faders.forEach(fader => appearOnScroll.observe(fader));
+}, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
 
-// contact form demo
-const form = document.getElementById("contact-form");
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  alert("Message sent! (Demo)");
-});
+faders.forEach(el => fadeObserver.observe(el));
+
+// -- Dot-grid canvas with cursor attraction --
+const SPACING  = 28;
+const DOT_R    = 1;
+const RADIUS   = 130;
+const STRENGTH = 0.52;
+const SPRING_K = 0.12;
+const DAMPING  = 0.75;
+const IDLE_EPS = 0.01;
+
+let canvas = document.getElementById('bg-dots');
+let ctx = canvas ? canvas.getContext('2d') : null;
+let dots = [];
+let mouse = { x: -9999, y: -9999 };
+let rafId = 0;
+let rafRunning = false;
+let dotColor = '';
+let resizeRaf = 0;
+
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// -- Color probe: reads CSS - dot variable as rgba for canvas --
+let probe = null;
+
+function ensureProbe() {
+  if (!probe || !probe.isConnected) {
+    probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;background:var(--dot)';
+    document.body.appendChild(probe);
+  }
+  return probe;
+}
+
+function readDotColor() {
+  const p = ensureProbe();
+  const resolved = getComputedStyle(p).backgroundColor;
+  dotColor = resolved || (isLight() ? 'rgb(180,175,165)' : 'rgb(50,50,60)');
+}
+
+function buildGrid() {
+  if (!canvas) return;
+  dots = [];
+  const ox = SPACING / 2, oy = SPACING / 2;
+  const cols = Math.ceil(window.innerWidth  / SPACING) + 2;
+  const rows = Math.ceil(window.innerHeight / SPACING) + 2;
+  for (let r = -1; r < rows; r++) {
+    for (let c = -1; c < cols; c++) {
+      const hx = ox + c * SPACING;
+      const hy = oy + r * SPACING;
+      dots.push({ hx, hy, x: hx, y: hy, vx: 0, vy: 0 });
+    }
+  }
+}
+
+function drawDots() {
+  if (!canvas || !ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = dotColor;
+  ctx.beginPath();
+  for (const d of dots) {
+    ctx.moveTo(d.x + DOT_R, d.y);
+    ctx.arc(d.x, d.y, DOT_R, 0, Math.PI * 2);
+  }
+  ctx.fill();
+}
+
+function tickDots() {
+  let anyActive = mouse.x > -1000;
+
+  for (const d of dots) {
+    const dx = mouse.x - d.hx;
+    const dy = mouse.y - d.hy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    let tx = d.hx, ty = d.hy;
+    if (dist > 0 && dist < RADIUS) {
+      const falloff = 1 - dist / RADIUS;
+      tx = d.hx + dx * STRENGTH * falloff;
+      ty = d.hy + dy * STRENGTH * falloff;
+    }
+
+    d.vx = (d.vx + (tx - d.x) * SPRING_K) * DAMPING;
+    d.vy = (d.vy + (ty - d.y) * SPRING_K) * DAMPING;
+    d.x += d.vx;
+    d.y += d.vy;
+
+    if (!anyActive && (
+      Math.abs(d.vx) > IDLE_EPS || Math.abs(d.vy) > IDLE_EPS ||
+      Math.abs(d.x - d.hx) > IDLE_EPS || Math.abs(d.y - d.hy) > IDLE_EPS
+    )) anyActive = true;
+  }
+
+  drawDots();
+
+  if (anyActive) {
+    rafId = requestAnimationFrame(tickDots);
+  } else {
+    rafRunning = false;
+  }
+}
+
+function startDotTick() {
+  if (!rafRunning) {
+    rafRunning = true;
+    rafId = requestAnimationFrame(tickDots);
+  }
+}
+
+function resizeCanvas() {
+  if (!canvas || !ctx) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = window.innerWidth  * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  buildGrid();
+  if (!rafRunning) drawDots();
+}
+
+// Init canvas
+readDotColor();
+resizeCanvas();
+
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(resizeRaf);
+  resizeRaf = requestAnimationFrame(resizeCanvas);
+}, { passive: true });
+
+// Mouse tracking
+if (!prefersReduced) {
+  document.addEventListener('mousemove', e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    startDotTick();
+  }, { passive: true });
+
+  document.addEventListener('mouseleave', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+
+  // Touch support
+  document.addEventListener('touchmove', e => {
+    const t = e.touches[0];
+    mouse.x = t.clientX;
+    mouse.y = t.clientY;
+    startDotTick();
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    mouse.x = -9999;
+    mouse.y = -9999;
+  });
+}
+
+// Watch for theme class changes and re-read dot color
+new MutationObserver(() => {
+  readDotColor();
+  if (!rafRunning) drawDots();
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
