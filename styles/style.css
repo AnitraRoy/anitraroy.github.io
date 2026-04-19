@@ -43,6 +43,8 @@ html {
   text-rendering: optimizeLegibility;
   scrollbar-gutter: stable;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
 html.light {

@@ -43,20 +43,12 @@ function updateActiveNav() {
   });
 
   navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      const href = link.getAttribute('href');
-
-      if (href && href.startsWith('#')) {
-        e.preventDefault();
-
-        const target = document.querySelector(href);
-        if (target) {
-          const offset = 80;
-          const top = target.getBoundingClientRect().top + window.scrollY - offset;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
-      }
-    });
+    const href = link.getAttribute('href');
+    if (href === '#' + currentSection) {
+      link.classList.add('active');
+    } else {
+      link.classList.remove('active');
+    }
   });
 }
 
