@@ -14,7 +14,7 @@ function setTheme(light) {
   if (!rafRunning) drawDots();
 }
 
-themeBtn.addEventListener('click', () => setTheme(!isLight()));
+themeBtn?.addEventListener('click', () => setTheme(!isLight()));
 
 // -- Theme-aware logo images --
 function updateLogoIcons() {
@@ -30,29 +30,56 @@ updateLogoIcons();
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 
-const sectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.getAttribute('id');
-      navLinks.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === '#' + id);
-      });
+function updateActiveNav() {
+  if (!sections.length) return;
+  let currentSection = sections[0].id;
+
+  sections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+
+    if (rect.top <= window.innerHeight * 0.35) {
+      currentSection = section.id;
     }
   });
-}, { rootMargin: '-40% 0px -55% 0px' });
 
-sections.forEach(s => sectionObserver.observe(s));
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+
+        const target = document.querySelector(href);
+        if (target) {
+          const offset = 80;
+          const top = target.getBoundingClientRect().top + window.scrollY - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }
+    });
+  });
+}
+
+window.addEventListener('scroll', updateActiveNav, { passive: true });
+window.addEventListener('resize', updateActiveNav);
+updateActiveNav();
 
 // Smooth scroll on nav link click
 navLinks.forEach(link => {
   link.addEventListener('click', e => {
-    e.preventDefault();
-    const targetId = link.getAttribute('href').slice(1);
-    const target = document.getElementById(targetId);
-    if (target) {
-      const offset = 80;
-      const top = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: 'smooth' });
+    const href = link.getAttribute('href');
+
+    if (href.startsWith('#')) {
+      e.preventDefault();
+
+      const targetId = href.slice(1);
+      const target = document.getElementById(targetId);
+
+      if (target) {
+        const offset = 80;
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
     }
   });
 });
@@ -119,7 +146,7 @@ function ensureProbe() {
 function readDotColor() {
   const p = ensureProbe();
   const resolved = getComputedStyle(p).backgroundColor;
-  dotColor = resolved || (isLight() ? 'rgb(180,175,165)' : 'rgb(50,50,60)');
+  dotColor = (resolved && resolved !== 'rgba(0, 0, 0, 0)') ? resolved : (isLight() ? 'rgb(180,175,165)' : 'rgb(50,50,60)');
 }
 
 function buildGrid() {
@@ -202,8 +229,12 @@ function resizeCanvas() {
 }
 
 // Init canvas
-readDotColor();
-resizeCanvas();
+requestAnimationFrame(() => {
+  if (canvas && ctx) {
+    readDotColor();
+    resizeCanvas();
+  }
+});
 
 window.addEventListener('resize', () => {
   cancelAnimationFrame(resizeRaf);
@@ -239,6 +270,23 @@ if (!prefersReduced) {
 
 // Watch for theme class changes and re-read dot color
 new MutationObserver(() => {
+  if (!canvas || !ctx) return;
   readDotColor();
   if (!rafRunning) drawDots();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+// Mobile menu toggle
+const navToggle = document.querySelector('.nav-toggle');
+const navLinksContainer = document.querySelector('.nav-links');
+
+if (navToggle && navLinksContainer) {
+  navToggle.addEventListener('click', () => {
+    navLinksContainer.classList.toggle('open');
+  });
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinksContainer.classList.remove('open');
+    });
+  });
+}
