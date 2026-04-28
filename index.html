@@ -18,7 +18,12 @@
 </head>
 
 <body>
-  <canvas id="bg-dots" aria-hidden="true"></canvas>
+  <canvas id="bg-mesh" aria-hidden="true"></canvas>
+  
+  <!-- SCROLL PROGRESS -->
+  <div class="scroll-progress-track">
+    <div class="scroll-progress-fill" id="scroll-progress-fill"></div>
+  </div>
 
   <!-- NAVBAR -->
   <nav class="site-nav">
@@ -61,27 +66,15 @@
           <div class="hero-text">
             <h1 class="display-name" id="display-name">Anitra Roy</h1>
             <p class="tagline">
-              <span class="tagline-title">Industrial Engineer</span>
+              <span class="tagline-title" id="typed-tagline"></span><span class="cursor-blink">|</span>
             </p>
             <p class="bio">
-              I like building simple solutions to complex problems. 
+              I build simple solutions to complex problems. <br>
               Studying Industrial Engineering at the University of Toronto, with minors in 
               Artificial Intelligence &amp; Engineering Business.
             </p>
           </div>
-          <div class="hero-photo">
-            <a href="https://linkedin.com/in/AnitraRoy" target="_blank" rel="noopener noreferrer">
-              <img src="images/portrait.jpeg" alt="Anitra Roy" loading="eager" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- ABOUT -->
-      <section id="about" class="page-enter" style="animation-delay:110ms">
-        <h2 class="section-label">About</h2>
-        <div class="about-layout">
-          <div class="about-photo">
+          <div class="hero-carousel">
             <div class="carousel">
               <img src="images/about.png" alt="Anitra Roy" class="carousel-image active" />
               <img src="images/about2.png" alt="Anitra Roy" class="carousel-image" />
@@ -90,15 +83,33 @@
               <img src="images/about5.png" alt="Anitra Roy" class="carousel-image" />
             </div>
           </div>
-          <div class="about-text fade-in">
-            <p>
-              I&apos;m an Industrial Engineer who enjoys using data and smart 
-              problem-solving to improve how things work. I focus on optimizing 
-              processes and making better decisions through practical, scalable 
-              solutions that actually deliver results.
-            </p>
-            <p class="skills-line"><span class="skill-label">Technical Skills</span> Python, SQL, Java, Excel, R, Gurobi</p>
-            <p class="skills-line"><span class="skill-label">Interests</span> Data Science, Machine Learning, Artificial Intelligence, Sustainable Systems</p>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="page-enter" style="animation-delay:110ms;">
+        <h2 class="section-label">About</h2>
+        <div class="about-text-only fade-in" style="border-top: 1px solid var(--border); padding-top: 1.25rem;">
+          <p>
+            I&apos;m an Industrial Engineer who enjoys using data and smart 
+            problem-solving to improve how things work. I focus on optimizing 
+            processes and making better decisions through practical, scalable 
+            solutions that actually deliver results.
+          </p>
+          <div class="skills-block">
+            <p class="skill-label">Technical Skills</p>
+            <div class="skill-pills">
+              <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
+              <span class="skill-pill" style="--pill-color: 249,115,22;">SQL</span>
+              <span class="skill-pill" style="--pill-color: 234,179,8;">Java</span>
+              <span class="skill-pill" style="--pill-color: 34,197,94;">Excel</span>
+              <span class="skill-pill" style="--pill-color: 99,102,241;">R</span>
+              <span class="skill-pill" style="--pill-color: 239,68,68;">Gurobi</span>
+            </div>
+          </div>
+          <div class="skills-block">
+            <p class="skill-label">Interests</p>
+            <p class="skills-line">Data Science, Machine Learning, Artificial Intelligence, Sustainable Systems</p>
           </div>
         </div>
       </section>
@@ -354,7 +365,10 @@
 
     <!-- FOOTER -->
     <footer class="site-footer">
-      <span class="footer-copy">© 2026 Anitra Roy</span>
+      <span class="footer-commit" id="footer-commit" title="Last updated">
+        <svg class="commit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/></svg>
+        <span id="commit-label">loading...</span>
+      </span>
 
       <!-- view counter (via GoatCounter) -->
       <div class="view-counter">
@@ -381,6 +395,7 @@
 
   <script src="scripts/main.js"></script>
 
+  <!-- GoatCounter -->
   <script data-goatcounter="https://anitraroy.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>
 
