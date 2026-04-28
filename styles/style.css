@@ -7,7 +7,7 @@
   --fg: var(--dark-bg);
   --muted:   oklch(45%   0.003 80);
   --subtle:  oklch(57%   0.003 80);
-  --border:  oklch(88%   0.003 80);
+  --border:  oklch(80%   0.003 80);
   --dot:     oklch(83%   0.003 80);
 
   --font-display: 'DM Serif Text', serif;

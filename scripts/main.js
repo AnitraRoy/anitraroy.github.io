@@ -209,10 +209,10 @@ function getMeshTriColor(mx, my) {
   const totalInf = Math.min(1, cursorInf + clickInf * 0.85);
 
   if (light) {
-    // Light: amber left -> rose right
+    // Light: amber left -> red right
     // Base gradient colors
-    const leftR = 220, leftG = 165, leftB = 100;   // amber
-    const rightR = 205, rightG = 135, rightB = 150; // rose
+    const leftR = 215, leftG = 170, leftB = 115; // amber
+    const rightR = 130, rightG = 35, rightB = 35; // red
 
     const baseR = leftR + (rightR - leftR) * gx;
     const baseG = leftG + (rightG - leftG) * gx;
