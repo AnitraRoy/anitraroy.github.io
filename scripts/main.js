@@ -335,6 +335,24 @@ function tickMesh() {
       ty = p.hy + dy * f;
     }
 
+    for (const pulse of meshClickPulses) {
+      const pdx  = p.hx - pulse.x;
+      const pdy  = p.hy - pulse.y;
+      const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
+      if (pdist < 1) continue;
+
+      const progress    = pulse.age / pulse.maxAge;
+      const waveFront   = MESH_RADIUS * 3.5 * progress;
+      const ringWidth   = MESH_RADIUS * 1.2;
+      const distToRing  = Math.abs(pdist - waveFront);
+      const onRing      = Math.max(0, 1 - distToRing / ringWidth);
+      const fade        = 1 - progress;
+      const force       = onRing * fade * 18;
+
+      tx += (pdx / pdist) * force;
+      ty += (pdy / pdist) * force;
+    }
+
     p.vx = (p.vx + (tx - p.x) * MESH_SPRING) * MESH_DAMP;
     p.vy = (p.vy + (ty - p.y) * MESH_SPRING) * MESH_DAMP;
     p.x += p.vx;
@@ -385,15 +403,36 @@ if (!meshPrefersReduced) {
     meshMouse.y = -9999;
   });
 
-  // Click pulse
-  document.addEventListener('click', e => {
-    meshClickPulses.push({
-      x: e.clientX,
-      y: e.clientY,
-      age: 0,
-      maxAge: 55
-    });
+  // Click pulse — single click + hold to repeat
+  let holdInterval = null;
+
+  function spawnPulse(x, y) {
+    meshClickPulses.push({ x, y, age: 0, maxAge: 80 });
     startMeshTick();
+  }
+
+  let holdPos = { x: 0, y: 0 };
+
+  document.addEventListener('mousemove', e => {
+    holdPos.x = e.clientX;
+    holdPos.y = e.clientY;
+  });
+
+  document.addEventListener('mousedown', e => {
+    holdPos.x = e.clientX;
+    holdPos.y = e.clientY;
+    spawnPulse(holdPos.x, holdPos.y);
+    holdInterval = setInterval(() => spawnPulse(holdPos.x, holdPos.y), 350);
+  });
+
+  document.addEventListener('mouseup', () => {
+    clearInterval(holdInterval);
+    holdInterval = null;
+  });
+
+  document.addEventListener('mouseleave', () => {
+    clearInterval(holdInterval);
+    holdInterval = null;
   });
 
   document.addEventListener('touchmove', e => {
@@ -408,7 +447,7 @@ if (!meshPrefersReduced) {
       x: e.changedTouches[0].clientX,
       y: e.changedTouches[0].clientY,
       age: 0,
-      maxAge: 55
+      maxAge: 80
     });
     meshMouse.x = -9999;
     meshMouse.y = -9999;
@@ -424,10 +463,8 @@ new MutationObserver(() => {
 
 // Custom cursor
 const dot = document.querySelector('.cursor-dot');
-const ring = document.querySelector('.cursor-ring');
 
 let mouseX = 0, mouseY = 0;
-let ringX = 0, ringY = 0;
 let cursorVisible = false;
 
 document.addEventListener('mousemove', (e) => {
@@ -438,29 +475,9 @@ document.addEventListener('mousemove', (e) => {
 
   if (!cursorVisible) {
     cursorVisible = true;
-    ringX = mouseX;
-    ringY = mouseY;
     dot.style.visibility = 'visible';
-    ring.style.visibility = 'visible';
   }
 });
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-
-  dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
-});
-
-function animateRing() {
-  ringX += (mouseX - ringX) * 0.15;
-  ringY += (mouseY - ringY) * 0.15;
-
-  ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
-  requestAnimationFrame(animateRing);
-}
-
-animateRing();
 
 // -- Typing tagline --
 const taglineTitles = [
@@ -761,6 +778,7 @@ window.addEventListener('resize', () => {
     // filter projects
     const projects = document.querySelectorAll('#projects .entry-row');
 
+    let visibleIndex = 0;
     projects.forEach(row => {
       const tags = (row.dataset.tags || '').split(' ');
 
@@ -768,7 +786,21 @@ window.addEventListener('resize', () => {
         activeFilters.includes('all') ||
         activeFilters.some(f => tags.includes(f));
 
-      row.classList.toggle('hidden', !match);
+      if (match) {
+        row.classList.remove('hidden', 'visible');
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(12px)';
+        const delay = visibleIndex * 80;
+        setTimeout(() => {
+          row.style.opacity = '';
+          row.style.transform = '';
+          row.classList.add('visible');
+        }, delay);
+        visibleIndex++;
+      } else {
+        row.classList.add('hidden');
+        row.classList.remove('visible');
+      }
     });
 
     // highlight pills inside visible projects
