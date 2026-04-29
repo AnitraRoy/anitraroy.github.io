@@ -84,12 +84,21 @@ html:not(.light) body::after { opacity: 0.045; }
 a { color: inherit; text-decoration: none; }
 img, video { max-width: 100%; display: block; }
 
-a,
-button,
-[role="button"],
-.nav-link,
-.site-nav * {
-  cursor: none !important;
+@media (hover: hover) and (pointer: fine) {
+  html,
+  body,
+  a,
+  button,
+  [role="button"],
+  .nav-link,
+  .site-nav * {
+    cursor: none !important;
+  }
+
+  .cursor-dot,
+  .cursor-ring {
+    display: block;
+  }
 }
 
 html::-webkit-scrollbar {
@@ -955,9 +964,16 @@ main {
   .commit-sha { display: none; }
 }
 
-@media (max-width: 700px) {
+@media (hover: none) and (pointer: coarse) {
   .cursor-dot,
   .cursor-ring {
-    display: none;
+    display: none !important;
+  }
+
+  html,
+  body,
+  a,
+  button {
+    cursor: auto !important;
   }
 }
