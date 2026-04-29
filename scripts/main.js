@@ -28,12 +28,39 @@ const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 
 function updateActiveNav() {
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+
+    // Path-based match for top-level pages (/background, /projects, /photos)
+    if (href !== '/' && href.startsWith('/') && path.startsWith(href)) {
+      link.classList.add('active');
+      return;
+    }
+
+    // Exact match for home
+    if (href === '/' && path === '/') {
+      link.classList.add('active');
+      return;
+    }
+
+    // Anchor-based match for single-page sections
+    if (href.startsWith('#') && sections.length) {
+      // handled below
+      return;
+    }
+
+    link.classList.remove('active');
+  });
+}
+
+function updateActiveNavScroll() {
   if (!sections.length) return;
   let currentSection = sections[0].id;
 
   sections.forEach(section => {
     const rect = section.getBoundingClientRect();
-
     if (rect.top <= window.innerHeight * 0.35) {
       currentSection = section.id;
     }
@@ -41,6 +68,7 @@ function updateActiveNav() {
 
   navLinks.forEach(link => {
     const href = link.getAttribute('href');
+    if (!href.startsWith('#')) return;
     if (href === '#' + currentSection) {
       link.classList.add('active');
     } else {
@@ -49,7 +77,7 @@ function updateActiveNav() {
   });
 }
 
-window.addEventListener('scroll', updateActiveNav, { passive: true });
+window.addEventListener('scroll', updateActiveNavScroll, { passive: true });
 window.addEventListener('resize', updateActiveNav);
 updateActiveNav();
 
@@ -211,8 +239,8 @@ function getMeshTriColor(mx, my) {
   if (light) {
     // Light: amber left -> red right
     // Base gradient colors
-    const leftR = 215, leftG = 170, leftB = 115; // amber
-    const rightR = 130, rightG = 35, rightB = 35; // red
+    const leftR = 235, leftG = 160, leftB = 85; // amber
+    const rightR = 175, rightG = 45, rightB = 50; // red
 
     const baseR = leftR + (rightR - leftR) * gx;
     const baseG = leftG + (rightG - leftG) * gx;
@@ -393,6 +421,46 @@ new MutationObserver(() => {
   if (!meshCanvas || !meshCtx) return;
   if (!meshRunning) drawMesh();
 }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+// Custom cursor
+const dot = document.querySelector('.cursor-dot');
+const ring = document.querySelector('.cursor-ring');
+
+let mouseX = 0, mouseY = 0;
+let ringX = 0, ringY = 0;
+let cursorVisible = false;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+
+  if (!cursorVisible) {
+    cursorVisible = true;
+    ringX = mouseX;
+    ringY = mouseY;
+    dot.style.visibility = 'visible';
+    ring.style.visibility = 'visible';
+  }
+});
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+
+  dot.style.transform = `translate(${mouseX}px, ${mouseY}px)`;
+});
+
+function animateRing() {
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+
+  ring.style.transform = `translate(${ringX}px, ${ringY}px)`;
+  requestAnimationFrame(animateRing);
+}
+
+animateRing();
 
 // -- Typing tagline --
 const taglineTitles = [
@@ -637,6 +705,77 @@ if (aboutSection) conObserver.observe(aboutSection);
 window.addEventListener('resize', () => {
   if (conActive) initConstellation();
 });
+
+// Project filters
+(function () {
+  const filters = document.getElementById('project-filters');
+  if (!filters) return;
+
+  const allBtn = filters.querySelector('[data-filter="all"]');
+  const projects = document.querySelectorAll('#projects .entry-row');
+
+  function updatePillHighlights(activeFilters) {
+    projects.forEach(row => {
+      const pills = row.querySelectorAll('.skill-pill');
+
+      pills.forEach(pill => {
+        const tag = pill.textContent.trim();
+        const match = activeFilters.includes(tag);
+
+        pill.classList.toggle('pill-active', match);
+      });
+    });
+  }
+  
+  filters.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+
+    const filter = btn.dataset.filter;
+
+    const allBtn = filters.querySelector('[data-filter="all"]');
+
+    if (filter === 'all') {
+      // reset everything
+      filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+    } else {
+      // toggle clicked filter
+      btn.classList.toggle('active');
+
+      // remove "all" if any specific filter is active
+      allBtn.classList.remove('active');
+    }
+
+    // collect active filters
+    let activeFilters = Array.from(
+      filters.querySelectorAll('.filter-btn.active')
+    ).map(b => b.dataset.filter);
+
+    // if nothing selected, then fallback to "all"
+    if (activeFilters.length === 0) {
+      allBtn.classList.add('active');
+      activeFilters = ['all'];
+    }
+
+    // filter projects
+    const projects = document.querySelectorAll('#projects .entry-row');
+
+    projects.forEach(row => {
+      const tags = (row.dataset.tags || '').split(' ');
+
+      const match =
+        activeFilters.includes('all') ||
+        activeFilters.some(f => tags.includes(f));
+
+      row.classList.toggle('hidden', !match);
+    });
+
+    // highlight pills inside visible projects
+    updatePillHighlights(activeFilters);
+  });
+})();
+
 
 // -- Mobile nav toggle --
 const navToggle    = document.querySelector('.nav-toggle');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Photos — Anitra Roy</title>
+  <title>Projects — Anitra Roy</title>
   <link rel="icon" type="image/svg+xml" href="/images/browser-light.svg" media="(prefers-color-scheme: light)">
   <link rel="icon" type="image/svg+xml" href="/images/browser-dark.svg" media="(prefers-color-scheme: dark)">
   <link rel="stylesheet" href="/styles/style.css" />
@@ -48,13 +48,18 @@
 
       <div class="nav-right-group">
         <ul class="nav-links">
-          <li><a href="/"           class="nav-link">home</a></li>
-          <li><a href="/background" class="nav-link">background</a></li>
-          <li><a href="/projects"   class="nav-link">projects</a></li>
-          <li><a href="/photos"     class="nav-link active">photos</a></li>
+          <li><a href="/" class="nav-link">home</a></li>
+          <li><a href="/background" class="nav-link active">background</a></li>
+          <li><a href="/projects" class="nav-link">projects</a></li>
+          <li><a href="/photos" class="nav-link">photos</a></li>
         </ul>
+
         <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme"></button>
-        <button class="nav-toggle" aria-label="Open menu">☰</button>
+        <!-- mobile nav version -->
+        <button class="nav-toggle" aria-label="Open menu">
+          ☰
+        </button>
+
       </div>
     </div>
   </nav>
@@ -62,34 +67,131 @@
   <!-- PAGE CONTENT -->
   <div class="wrap">
     <main>
-      <section class="page-enter">
-        <h2 class="section-label">Photos</h2>
 
-        <div class="photos-grid">
-          <img src="/photos/img1.jpeg" alt="photo 1" />
-          <img src="/photos/img2.jpeg" alt="photo 2" />
-          <img src="/photos/img3.jpeg" alt="photo 3" />
-          <img src="/photos/img4.jpeg" alt="photo 4" />
-          <img src="/photos/img5.png"  alt="photo 5" />
-          <img src="/photos/img6.jpeg" alt="photo 6" />
-          <img src="/photos/img7.jpeg" alt="photo 7" />
-          <img src="/photos/img8.png"  alt="photo 8" />
-          <img src="/photos/img9.jpeg" alt="photo 9" />
+      <!-- EDUCATION -->
+      <section id="background" class="page-enter" style="animation-delay:210ms">
+        <h2 class="section-label">Education</h2>
+        <div class="entry-list">
+          <div class="entry-row fade-in">
+            <div class="entry-logo">
+              <img class="theme-aware-logo" data-dark="/images/logos/uoft-dark.png" data-light="/images/logos/uoft.png" src="/images/logos/uoft-dark.png" alt="University of Toronto" />
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <span class="entry-title">University of Toronto</span>
+                <span class="entry-date">Sep 2022 — Present</span>
+              </div>
+              <p class="entry-role">BASc., Industrial Engineering</p>
+              <p class="entry-detail">Minors: Artificial Intelligence &amp; Engineering Business</p>
+            </div>
+          </div>
         </div>
-
       </section>
+
+      <!-- EXPERIENCE -->
+      <section id="experience" class="page-enter" style="animation-delay:310ms">
+        <h2 class="section-label">Experience</h2>
+        <div class="entry-list">
+
+          <div class="entry-row fade-in">
+            <div class="entry-logo">
+              <img class="theme-aware-logo" data-dark="/images/logos/ttc-dark.png" data-light="/images/logos/ttc.png" src="/images/logos/ttc-dark.png" alt="TTC" />
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <span class="entry-title">Toronto Transit Commission</span>
+                <span class="entry-date">May 2026 — Present</span>
+              </div>
+              <div class="entry-meta">
+                <span class="entry-role">Data Engineering Intern, Fleet Analytics</span>
+                <span class="entry-location">Toronto, Canada</span>
+              </div>
+              <ul class="entry-bullets">
+              </ul>
+              <p class="entry-note">Working on the Green Fleet Program, Vehicle Programs Dept.</p>
+            </div>
+          </div>
+
+          <div class="entry-row fade-in">
+            <div class="entry-logo">
+              <img class="theme-aware-logo" data-dark="/images/logos/uhn-dark.png" data-light="/images/logos/uhn.png" src="/images/logos/uhn-dark.png" alt="UHN" />
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <span class="entry-title">University Health Network</span>
+                <span class="entry-date">May 2025 — Present</span>
+              </div>
+              <div class="entry-meta">
+                <span class="entry-role">Data Engineer</span>
+                <span class="entry-location">Toronto, Canada (remote)</span>
+              </div>
+              <ul class="entry-bullets">
+                <li>Automated ETL pipelines in Python, integrating and preprocessing clinical datasets — saving 40+ hours/month.</li>
+                <li>Implemented data validation logic that identified and corrected 18% of input errors, enhancing reporting quality.</li>
+                <li>Transformed multi-sheet Excel datasets into structured STATA-ready datasets, processing 50,000+ records for 800+ patients.</li>
+                <li>Built and deployed a WordPress-based website with a MySQL backend, centralizing structured data access for 30+ monthly internal users.</li>
+              </ul>
+              <p class="entry-note">Working with the Kidney Health Education and Research Group (KHERG).</p>
+            </div>
+          </div>
+
+          <div class="entry-row fade-in">
+            <div class="entry-logo">
+              <img class="theme-aware-logo" data-dark="/images/logos/iit-dark.png" data-light="/images/logos/iit.png" src="/images/logos/iit-dark.png" alt="IIT Kharagpur" />
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <span class="entry-title">Indian Institute of Technology, Kharagpur</span>
+                <span class="entry-date">May 2024 — Aug 2025</span>
+              </div>
+              <div class="entry-meta">
+                <span class="entry-role">Undergraduate Researcher</span>
+                <span class="entry-location">Kharagpur, India (remote)</span>
+              </div>
+              <ul class="entry-bullets">
+                <li>Developed MILP models in Gurobi to optimize electric bus depot utilization and fleet routing — reducing costs by 15%, improving efficiency by 70%.</li>
+                <li>Mapped real-world networks using OpenStreetMap and OSRM API to simulate and optimize delivery routing.</li>
+                <li>Prepared structured reports and presented weekly updates to academic stakeholders.</li>
+              </ul>
+              <p class="entry-note">Under supervision of Prof. Mamata Jenamani and Dr. Biswajit Kar.</p>
+            </div>
+          </div>
+
+          <div class="entry-row fade-in">
+            <div class="entry-logo">
+              <img class="theme-aware-logo" data-dark="/images/logos/uo-dark.png" data-light="/images/logos/uo.png" src="/images/logos/uo-dark.png" alt="University of Ottawa" />
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <span class="entry-title">Telfer School of Management, University of Ottawa</span>
+                <span class="entry-date">May 2023 — Aug 2023</span>
+              </div>
+              <div class="entry-meta">
+                <span class="entry-role">Undergraduate Research Assistant</span>
+                <span class="entry-location">Ottawa, Canada</span>
+              </div>
+              <ul class="entry-bullets">
+                <li>Conducted data-driven literature analysis of 40+ scholarly articles on supply chain management trends.</li>
+                <li>Synthesized findings into a structured 7-page report highlighting patterns and cross-sector implications.</li>
+                <li>Processed Bloomberg datasets and developed Stata scripts to analyze ESG metrics and CEO managerial ability for 15+ large firms.</li>
+              </ul>
+              <p class="entry-note">Under supervision of Prof. Shantanu Dutta.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </main>
 
-    <!-- FOOTER -->
+  <!-- FOOTER -->
     <footer class="site-footer">
       <span class="footer-commit" id="footer-commit" title="Last updated">
-        <svg class="commit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="3"/>
-          <line x1="3" y1="12" x2="9" y2="12"/>
-          <line x1="15" y1="12" x2="21" y2="12"/>
-        </svg>
+        <svg class="commit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="21" y2="12"/></svg>
         <span id="commit-label">loading...</span>
       </span>
+
+      <!-- view counter (via GoatCounter) -->
       <div class="view-counter">
         <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="M1 12C1 12 5 5 12 5C19 5 23 12 23 12C23 12 19 19 12 19C5 19 1 12 1 12Z"/>
@@ -97,6 +199,7 @@
         </svg>
         <span id="gc-count">…</span>
       </div>
+
       <div class="footer-socials">
         <a href="https://github.com/AnitraRoy" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="GitHub">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
@@ -116,6 +219,7 @@
   <!-- GoatCounter -->
   <script data-goatcounter="https://anitraroy.goatcounter.com/count"
         async src="https://gc.zgo.at/count.js"></script>
+
   <script>
     var r = new XMLHttpRequest();
     r.addEventListener('load', function() {

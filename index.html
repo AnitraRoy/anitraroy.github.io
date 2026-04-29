@@ -17,6 +17,9 @@
   </script>
 </head>
 
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
 <body>
   <canvas id="bg-mesh" aria-hidden="true"></canvas>
   
@@ -41,11 +44,9 @@
       </div>
       <div class="nav-right-group">
         <ul class="nav-links">
-          <li><a href="#home" class="nav-link">home</a></li>
-          <li><a href="#about" class="nav-link">about</a></li>
-          <li><a href="#education" class="nav-link">education</a></li>
-          <li><a href="#experience" class="nav-link">experience</a></li>
-          <li><a href="#projects" class="nav-link">projects</a></li>
+          <li><a href="#home" class="nav-link active">home</a></li>
+          <li><a href="/background" class="nav-link">background</a></li>
+          <li><a href="/projects" class="nav-link">projects</a></li>
           <li><a href="/photos" class="nav-link">photos</a></li>
         </ul>
         <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme"></button>
@@ -100,8 +101,8 @@
             <p class="skill-label">Technical Skills</p>
             <div class="skill-pills">
               <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
-              <span class="skill-pill" style="--pill-color: 249,115,22;">SQL</span>
               <span class="skill-pill" style="--pill-color: 234,179,8;">Java</span>
+              <span class="skill-pill" style="--pill-color: 249,115,22;">SQL</span>
               <span class="skill-pill" style="--pill-color: 34,197,94;">Excel</span>
               <span class="skill-pill" style="--pill-color: 99,102,241;">R</span>
               <span class="skill-pill" style="--pill-color: 239,68,68;">Gurobi</span>
@@ -111,253 +112,6 @@
             <p class="skill-label">Interests</p>
             <p class="skills-line">Data Science, Machine Learning, Artificial Intelligence, Sustainable Systems</p>
           </div>
-        </div>
-      </section>
-
-      <!-- EDUCATION -->
-      <section id="education" class="page-enter" style="animation-delay:210ms">
-        <h2 class="section-label">Education</h2>
-        <div class="entry-list">
-          <div class="entry-row fade-in">
-            <div class="entry-logo">
-              <img class="theme-aware-logo" data-dark="images/logos/uoft-dark.png" data-light="images/logos/uoft.png" src="images/logos/uoft-dark.png" alt="University of Toronto" />
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <span class="entry-title">University of Toronto</span>
-                <span class="entry-date">Sep 2022 — Present</span>
-              </div>
-              <p class="entry-role">BASc., Industrial Engineering</p>
-              <p class="entry-detail">Minors: Artificial Intelligence &amp; Engineering Business</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- EXPERIENCE -->
-      <section id="experience" class="page-enter" style="animation-delay:310ms">
-        <h2 class="section-label">Experience</h2>
-        <div class="entry-list">
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo">
-              <img class="theme-aware-logo" data-dark="images/logos/ttc-dark.png" data-light="images/logos/ttc.png" src="images/logos/ttc-dark.png" alt="TTC" />
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <span class="entry-title">Toronto Transit Commission</span>
-                <span class="entry-date">May 2026 — Present</span>
-              </div>
-              <p class="entry-role">Data Engineering Intern, Fleet Analytics</p>
-              <ul class="entry-bullets">
-              </ul>
-              <p class="entry-note">Working on the Green Fleet Program, Vehicle Programs Dept.</p>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo">
-              <img class="theme-aware-logo" data-dark="images/logos/uhn-dark.png" data-light="images/logos/uhn.png" src="images/logos/uhn-dark.png" alt="UHN" />
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <span class="entry-title">University Health Network</span>
-                <span class="entry-date">May 2025 — Present</span>
-              </div>
-              <p class="entry-role">Data Engineer</p>
-              <ul class="entry-bullets">
-                <li>Automated ETL pipelines in Python, integrating and preprocessing clinical datasets — saving 40+ hours/month.</li>
-                <li>Implemented data validation logic that identified and corrected 18% of input errors, enhancing reporting quality.</li>
-                <li>Transformed multi-sheet Excel datasets into structured STATA-ready datasets, processing 50,000+ records for 800+ patients.</li>
-                <li>Built and deployed a WordPress-based website with a MySQL backend, centralizing structured data access for 30+ monthly internal users.</li>
-              </ul>
-              <p class="entry-note">Working with the Kidney Health Education and Research Group (KHERG).</p>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo">
-              <img class="theme-aware-logo" data-dark="images/logos/iit-dark.png" data-light="images/logos/iit.png" src="images/logos/iit-dark.png" alt="IIT Kharagpur" />
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <span class="entry-title">Indian Institute of Technology, Kharagpur</span>
-                <span class="entry-date">May 2024 — Aug 2025</span>
-              </div>
-              <p class="entry-role">Student Researcher</p>
-              <ul class="entry-bullets">
-                <li>Developed MILP models in Gurobi to optimize electric bus depot utilization and fleet routing — reducing costs by 15%, improving efficiency by 70%.</li>
-                <li>Mapped real-world networks using OpenStreetMap and OSRM API to simulate and optimize delivery routing.</li>
-                <li>Prepared structured reports and presented weekly updates to academic stakeholders.</li>
-              </ul>
-              <p class="entry-note">Under supervision of Prof. Mamata Jenamani and Dr. Biswajit Kar.</p>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo">
-              <img class="theme-aware-logo" data-dark="images/logos/uo-dark.png" data-light="images/logos/uo.png" src="images/logos/uo-dark.png" alt="University of Ottawa" />
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <span class="entry-title">Telfer School of Management, University of Ottawa</span>
-                <span class="entry-date">May 2023 — Aug 2023</span>
-              </div>
-              <p class="entry-role">Undergraduate Research Assistant</p>
-              <ul class="entry-bullets">
-                <li>Conducted data-driven literature analysis of 40+ scholarly articles on supply chain management trends.</li>
-                <li>Synthesized findings into a structured 7-page report highlighting patterns and cross-sector implications.</li>
-                <li>Processed Bloomberg datasets and developed Stata scripts to analyze ESG metrics and CEO managerial ability for 15+ large firms.</li>
-              </ul>
-              <p class="entry-note">Under supervision of Prof. Shantanu Dutta.</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- PROJECTS -->
-      <section id="projects" class="page-enter" style="animation-delay:410ms">
-        <h2 class="section-label">Projects</h2>
-        <div class="entry-list">
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/m4ggie/swapr" target="_blank" rel="noopener noreferrer"><img src="images/projects/project7.png" alt="OptiCam" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/m4ggie/swapr" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">Swapr: Clothing Exchange Web App</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </a>
-                <span class="entry-date">Jan 2026 — Apr 2026</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Built a scalable Spring Boot backend enabling peer-to-peer clothing exchanges with item listings and image uploads.</li>
-                <li>Designed RESTful APIs and structured data models for efficient user, item, and transaction management.</li>
-                <li>Deployed a Dockerized Appsmith frontend for rapid UI development and seamless backend integration.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AnitraRoy/OptiCam" target="_blank" rel="noopener noreferrer"><img src="images/projects/project6.png" alt="OptiCam" /></a>
-            </div>
-            <div class="entry-body">
-             <div class="entry-top">
-                <a href="https://github.com/AnitraRoy/OptiCam" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">OptiCam: Speed Camera &amp; Collision Analysis in Toronto</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                  </svg>
-                </a>
-                <span class="entry-date">Sep 2025 — Dec 2025</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Integrated 600,000+ traffic collision records with speed camera and weather data to analyze spatial, temporal, and environmental factors.</li>
-                <li>Applied DBSCAN and K-means clustering to identify hotspots; built Negative Binomial Regression to estimate collision intensity.</li>
-                <li>Developed a maximum-coverage optimization model, increasing camera coverage from 27% to 68%.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AnitraRoy/EyeDentify" target="_blank" rel="noopener noreferrer"><img src="images/projects/project1.jpg" alt="EyeDentify" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/AnitraRoy/EyeDentify" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">EyeDentify: Retinal Disease Classification Using Deep Learning</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-                <span class="entry-date">Jun 2025 — Aug 2025</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Built baseline SVM and multiple CNN models (AlexNet, ResNet, VGG) on 12,000+ OCT retinal scans — achieving 91% classification accuracy.</li>
-                <li>Used CUDA acceleration and hyperparameter tuning to reduce training time by 78%.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AbderazakHsaini/TouristItinerary" target="_blank" rel="noopener noreferrer"><img src="images/projects/project2.png" alt="Vehicle Routing" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/AbderazakHsaini/TouristItinerary" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">Vehicle Routing &amp; Scheduling Optimization for Trip Planning</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-                <span class="entry-date">May 2025 — Jun 2025</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Engineered a multi-modal route optimization model using Gurobi MILP and a modified CVRP across 10 locations and 5 vehicle types.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AnitraRoy/Music-and-Text-Familiarity-vs-Typing" target="_blank" rel="noopener noreferrer"><img src="images/projects/project3.jpg" alt="Music Typing" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/AnitraRoy/Music-and-Text-Familiarity-vs-Typing" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">Statistical Analysis: Music &amp; Text Familiarity vs Typing</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-                <span class="entry-date">Feb 2025 — Apr 2025</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Designed a behavioural experiment analyzing how music type and text familiarity affect typing speed across 12 participants and 6 trial conditions.</li>
-                <li>Utilized R for data cleaning, visualization, and two-way ANOVA statistical modelling.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AnitraRoy/Shoe-Production-Plan-Optimization" target="_blank" rel="noopener noreferrer"><img src="images/projects/project4.jpg" alt="Shoe Production" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/AnitraRoy/Shoe-Production-Plan-Optimization" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">Shoe Company Production Plan Optimization</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-                <span class="entry-date">Sep 2024 — Dec 2024</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Built an AMPL model with Gurobi solver to allocate optimal production across 557 SKUs, minimizing shortages and idle capacity.</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="entry-row fade-in">
-            <div class="entry-logo entry-logo--img">
-              <a href="https://github.com/AnitraRoy/Battery-Electric-Bus-System-Optimization" target="_blank" rel="noopener noreferrer"><img src="images/projects/project5.jpg" alt="Electric Bus" /></a>
-            </div>
-            <div class="entry-body">
-              <div class="entry-top">
-                <a href="https://github.com/AnitraRoy/Battery-Electric-Bus-System-Optimization" target="_blank" rel="noopener noreferrer" class="entry-title-link">
-                  <span class="entry-title">Predictive Modeling &amp; Cost Optimization for Electric Bus Systems</span>
-                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-                <span class="entry-date">May 2024 — Aug 2024</span>
-              </div>
-              <ul class="entry-bullets">
-                <li>Developed a Gurobi MILP model to optimize 18 electric bus routes in New Delhi, reducing fuel consumption and operational costs by 4%.</li>
-                <li>Recommended a 70% increase in depot chargers; employed historical data analysis to forecast energy demand patterns.</li>
-              </ul>
-            </div>
-          </div>
-
         </div>
       </section>
 
