@@ -954,3 +954,10 @@ main {
 @media (max-width: 700px) {
   .commit-sha { display: none; }
 }
+
+@media (max-width: 700px) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
