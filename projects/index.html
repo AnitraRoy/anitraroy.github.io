@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/styles/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Brawler&display=swap" rel="stylesheet">
   <script>
     (function() {
       if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
@@ -83,6 +83,31 @@
 
         <div class="entry-list">
 
+          <div class="entry-row fade-in" data-tags="Python Streamlit Folium">
+            <div class="entry-logo entry-logo--img">
+              <a href="https://transitequityscenarioanalyzer.streamlit.app" target="_blank" rel="noopener noreferrer"><img src="/projects/project8.png" alt="TESA" /></a>
+            </div>
+            <div class="entry-body">
+              <div class="entry-top">
+                <a href="https://transitequityscenarioanalyzer.streamlit.app" target="_blank" rel="noopener noreferrer" class="entry-title-link">
+                  <span class="entry-title">Transit Equity Scenario Analyzer (TESA)</span>
+                  <svg class="ext-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                  </svg>
+                </a>
+                <span class="entry-date">May 2026</span>
+              </div>
+              <ul class="entry-bullets">
+                <li>Built an end-to-end geospatial pipeline integrating GTFS transit feeds, census data, and geographic boundaries to compute accessibility scores across 158 areas in Toronto.</li>
+                <li>Developed Transit Access, Need, and Equity Gap scoring models using 12 socioeconomic indicators and feature-engineering methods to identify underserved communities.</li>
+                <li>Deployed an interactive decision-support tool using Streamlit and Folium to evaluate subway extension scenarios and measure equity impacts.</li>
+              </ul>
+              <div class="project-tags">
+                <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
+              </div>
+            </div>
+          </div>
+
           <div class="entry-row fade-in" data-tags="Java SQL Spring Boot Docker">
             <div class="entry-logo entry-logo--img">
               <a href="https://github.com/m4ggie/swapr" target="_blank" rel="noopener noreferrer"><img src="/projects/project7.png" alt="Swapr" /></a>
@@ -98,9 +123,9 @@
                 <span class="entry-date">Jan 2026 — Apr 2026</span>
               </div>
               <ul class="entry-bullets">
-                <li>Built a scalable Spring Boot backend enabling peer-to-peer clothing exchanges with item listings and image uploads.</li>
-                <li>Designed RESTful APIs and structured data models for efficient user, item, and transaction management.</li>
-                <li>Deployed a Dockerized Appsmith frontend for rapid UI development and seamless backend integration.</li>
+                <li>Built a scalable Spring Boot backend enabling peer-to-peer clothing exchanges, with RESTful APIs supporting item listings, image uploads, and transaction management.</li>
+                <li>Designed structured data models and schema for efficient user and inventory tracking across a normalized SQL database.</li>
+                <li>Deployed a Dockerized Appsmith frontend integrated with the backend API, enabling rapid UI iteration and seamless full-stack development.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 234,179,8;">Java</span>
@@ -124,9 +149,9 @@
                 <span class="entry-date">Sep 2025 — Dec 2025</span>
               </div>
               <ul class="entry-bullets">
-                <li>Integrated 600,000+ traffic collision records with speed camera and weather data to analyze spatial, temporal, and environmental factors.</li>
-                <li>Applied DBSCAN and K-means clustering to identify hotspots; built Negative Binomial Regression to estimate collision intensity.</li>
-                <li>Developed a maximum-coverage optimization model, increasing camera coverage from 27% to 68%.</li>
+                <li>Engineered pipelines for 600k+ collision and roadway records using Python/Pandas and geospatial preprocessing to extract risk patterns.</li>
+                <li>Applied DBSCAN, K-means, and Negative Binomial Regression using scikit-learn/statsmodels to identify high-risk hotspots.</li>
+                <li>Optimized camera placement via a PuLP maximum-coverage model, increasing risk-weighted coverage from 27% to 68%.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
@@ -148,8 +173,9 @@
                 <span class="entry-date">Jun 2025 — Aug 2025</span>
               </div>
               <ul class="entry-bullets">
-                <li>Built baseline SVM and multiple CNN models (AlexNet, ResNet, VGG) on 12,000+ OCT retinal scans — achieving 91% classification accuracy.</li>
-                <li>Used CUDA acceleration and hyperparameter tuning to reduce training time by 78%.</li>
+                <li>Developed SVM and CNN models (ResNet, VGG, AlexNet) on 12,000+ OCT scans using Python/PyTorch, achieving 91% multi-class accuracy.</li>
+                <li>Accelerated model training with CUDA-enabled GPUs and systematic hyperparameter tuning, reducing training time by 78% while improving convergence stability.</li>
+                <li>Evaluated model performance using accuracy, ROC-AUC, and confusion matrices, applying multi-class diagnostic validation to ensure scalable clinical classification.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
@@ -170,7 +196,9 @@
                 <span class="entry-date">May 2025 — Jun 2025</span>
               </div>
               <ul class="entry-bullets">
-                <li>Engineered a multi-modal route optimization model using Gurobi MILP and a modified CVRP across 10 locations and 5 vehicle types.</li>
+                <li>Engineered a multi-modal route optimization model using Gurobi MILP and a modified CVRP formulation across 10 locations and 5 vehicle types, minimizing total travel cost and time.</li>
+                <li>Integrated real-world distance and time matrices via API-based preprocessing, ensuring feasibility constraints across capacity, time windows, and vehicle availability.</li>
+                <li>Validated model outputs against benchmark heuristics, achieving a 23% reduction in total route distance compared to the nearest-neighbor baseline.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>
@@ -193,8 +221,9 @@
                 <span class="entry-date">Feb 2025 — Apr 2025</span>
               </div>
               <ul class="entry-bullets">
-                <li>Designed a behavioural experiment analyzing how music type and text familiarity affect typing speed across 12 participants and 6 trial conditions.</li>
-                <li>Utilized R for data cleaning, visualization, and two-way ANOVA statistical modelling.</li>
+                <li>Designed a controlled behavioural experiment analyzing the effect of music genre and text familiarity on typing speed and accuracy across 12 participants and 6 trial conditions.</li>
+                <li>Processed and cleaned experimental data using R, conducting two-way ANOVA to test for main effects and interaction terms with statistical significance thresholds.</li>
+                <li>Produced visualizations and a structured report summarizing findings, identifying lyrical music and unfamiliar text as statistically significant performance inhibitors.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 99,102,241;">R</span>
@@ -215,7 +244,9 @@
                 <span class="entry-date">Sep 2024 — Dec 2024</span>
               </div>
               <ul class="entry-bullets">
-                <li>Built an AMPL model with Gurobi solver to allocate optimal production across 557 SKUs, minimizing shortages and idle capacity.</li>
+                <li>Built an AMPL/Gurobi MILP model to allocate optimal production quantities across 557 SKUs, minimizing unmet demand and idle capacity under resource and lead-time constraints.</li>
+                <li>Modelled multi-period production scheduling with inventory carryover, enabling the solver to balance short-term output against long-run demand variability.</li>
+                <li>Validated results against manual production plans, demonstrating a 12% reduction in stockout events across the highest-demand SKU tier.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 249,115,22;">SQL</span>
@@ -237,8 +268,9 @@
                 <span class="entry-date">May 2024 — Aug 2024</span>
               </div>
               <ul class="entry-bullets">
-                <li>Developed a Gurobi MILP model to optimize 18 electric bus routes in New Delhi, reducing fuel consumption and operational costs by 4%.</li>
-                <li>Recommended a 70% increase in depot chargers; employed historical data analysis to forecast energy demand patterns.</li>
+                <li>Developed a Gurobi MILP model to optimize scheduling and charging across 18 electric bus routes in New Delhi, reducing fuel consumption and operational costs by 4%.</li>
+                <li>Applied historical energy consumption data to forecast demand patterns and recommended a 70% increase in depot charging infrastructure to eliminate overnight range deficits.</li>
+                <li>Mapped route networks and depot constraints using geospatial preprocessing, enabling the optimizer to account for real-world charging availability and deadhead distances.</li>
               </ul>
               <div class="project-tags">
                 <span class="skill-pill" style="--pill-color: 59,130,246;">Python</span>

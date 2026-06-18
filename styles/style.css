@@ -20,7 +20,7 @@
   --text-lg:  clamp(1.375rem,  1.15rem  + 1.125vw, 1.875rem);
   --text-2xl: clamp(2.25rem,   1.9rem   + 1.75vw,  3.5rem);
 
-  --max-w: 860px;
+  --max-w: 900px;
   --pad-x: clamp(1.25rem, 5vw, 2rem);
 
   --pill-bg-alpha: 0.05;
@@ -648,8 +648,9 @@ main {
 
 .entry-title {
   font-size: var(--text-sm);
-  font-weight: 400;
+  font-weight: 600;
   color: var(--fg);
+  font-family: 'Brawler', serif;
 }
 
 .entry-title-link {
