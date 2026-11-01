@@ -1,0 +1,604 @@
+/* ---------- wide: a bigger canvas ---------- */
+@media (min-width: 1100px) {
+  html.fx-wide { --max-w: 1080px; }
+
+  /* Projects: three columns */
+  html.fx-wide .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  /* About: text left, skills/interests right */
+  html.fx-wide #about .about-text-only {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    column-gap: clamp(3rem, 6vw, 6rem);
+    row-gap: 1.75rem;
+    align-items: start;
+  }
+  html.fx-wide #about .about-text-only > p {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+    line-height: 1.75;
+    max-width: none;
+  }
+  html.fx-wide #about .about-text-only > .skills-block { grid-column: 2; margin: 0; }
+}
+
+@media (min-width: 760px) and (max-width: 1099px) {
+  html.fx-wide .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ===== projects: segmented filter with a sliding glow ===== */
+
+/* the divider moves onto the heading so the track can have its own border.
+   This replaces the earlier ".project-filters { border-top… }" rule. */
+#projects .section-label {
+  padding-bottom: 1.25rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-filters {
+  margin-top: 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+
+.project-filters {
+  --g: 168, 178, 198;
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.1rem 0 1.5rem;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--bg) 55%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+}
+
+.project-filters .filter-btn {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 0.5rem clamp(0.7rem, 2.6vw, 1.1rem);
+  background: none;
+  border: none;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--muted);
+  outline: none;
+  transition: color 250ms ease;
+}
+.project-filters .filter-btn::before,
+.project-filters .filter-btn::after { content: none; }
+.project-filters .filter-btn:hover,
+.project-filters .filter-btn.active { background: none; border: none; color: var(--fg); }
+
+/* keep a subtle ring for keyboard users only, not after a mouse click */
+.project-filters .filter-btn:focus-visible {
+  outline: 1px solid rgba(var(--g), 0.7);
+  outline-offset: -2px;
+}
+
+/* the moving highlight */
+.filter-glider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--gw, 0px);
+  transform: translateX(var(--gx, 0px));
+  border-radius: 999px;
+  background: rgba(var(--g), 0.16);
+  border: 1px solid rgba(var(--g), 0.55);
+  box-shadow: 0 0 18px rgba(var(--g), 0.35), inset 0 0 10px rgba(var(--g), 0.15);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 500ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 400ms ease, border-color 400ms ease, box-shadow 400ms ease,
+    opacity 300ms ease;
+}
+.filter-glider.ready   { opacity: 1; }
+.filter-glider.instant { transition: none; }   /* no sliding on first paint, resize or font load */
+
+html.light .filter-glider {
+  background: rgba(var(--g), 0.18);
+  box-shadow: 0 0 14px rgba(var(--g), 0.25), inset 0 0 8px rgba(var(--g), 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-glider { transition: none; }
+}
+
+/* ---------- rails ---------- */
+.rail {
+  position: fixed;
+  top: 50%;
+  z-index: 50;
+  transform: translateY(-50%) translateX(var(--rail-x, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms ease, transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rail-left  { --rail-x: -12px; align-items: flex-end; text-align: right; }
+.rail-right { --rail-x: 12px;  align-items: flex-start; text-align: left; }
+.rail.on { --rail-x: 0px; opacity: 1; pointer-events: auto; }
+.rail.on.behind { opacity: 0.06; pointer-events: none; }
+
+/* the Background page already has a timeline line */
+html.page-background .rail-track { display: none; }
+
+.rail-index { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+.rail-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  transition: color 250ms ease, transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rail-link b { font-weight: 400; opacity: 0.6; }
+.rail-link:hover { color: var(--fg); }
+.rail-link.active { color: var(--fg); transform: translateX(-6px); }
+.rail-link.active b { opacity: 1; }
+
+.rail-track {
+  position: relative;
+  align-self: flex-end;
+  width: 1px;
+  height: 90px;
+  background: var(--border);
+  overflow: hidden;
+}
+.rail-track i {
+  position: absolute;
+  inset: 0;
+  background: var(--fg);
+  opacity: 0.6;
+  transform-origin: top;
+  transform: scaleY(0);
+}
+
+.rail-eyebrow {
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  margin-bottom: 0.25rem;
+}
+
+.rail-links { display: flex; flex-direction: column; gap: 0.45rem; }
+.rail-ext {
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-text);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--subtle);
+  cursor: none;
+  transition: color 200ms ease;
+}
+.rail-ext i { font-style: normal; display: inline-block; transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+.rail-ext:hover { color: var(--fg); }
+.rail-ext:hover i { transform: translate(2px, -2px); }
+
+@media (max-width: 1099px) { .rail { display: none; } }
+
+/* ---------- hero ---------- */
+html.fx-hero .hero-section {
+  --hero-p: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  min-height: calc(100dvh - 76px);
+  padding: 1.5rem max(var(--pad-x), calc((100vw - var(--max-w)) / 2 + var(--pad-x))) 5rem;
+}
+
+html.fx-hero .hero-layout {
+  width: 100%;
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
+}
+
+html.fx-hero .display-name {
+  font-size: clamp(3.4rem, 10.5vw, 9.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  margin-bottom: 1.4rem;
+}
+html.fx-hero .tagline { margin-bottom: 1rem; }
+html.fx-hero .tagline-title { font-size: clamp(1.15rem, 2.1vw, 1.7rem); }
+html.fx-hero .bio { font-size: clamp(0.95rem, 1.3vw, 1.15rem); max-width: 46ch; }
+
+html.fx-hero .hero-carousel { align-self: center; }
+html.fx-hero .carousel {
+  width: clamp(210px, 30vw, 440px);
+  height: clamp(210px, 30vw, 440px);
+  align-self: center;
+}
+html.fx-hero .hero-carousel::after,
+html.fx-hero .hero-carousel::before { inset: -16px; }
+
+/* fade + drift as you scroll away */
+html.fx-hero .hero-text {
+  transform: translateY(calc(var(--hero-p) * -42px));
+  opacity: calc(1 - var(--hero-p) * 1.15);
+}
+html.fx-hero .hero-carousel {
+  transform: translateY(calc(var(--hero-p) * -80px)) scale(calc(1 - var(--hero-p) * 0.1));
+  opacity: calc(1 - var(--hero-p) * 1.1);
+}
+
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 1.6rem;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--text-2xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  opacity: calc(1 - var(--hero-p, 0) * 3);
+  transition: color 250ms ease;
+}
+.scroll-cue:hover { color: var(--fg); }
+.scroll-cue i {
+  display: block;
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(var(--fg), transparent);
+  transform-origin: top;
+  animation: cueLine 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes cueLine {
+  0%   { transform: scaleY(0); opacity: 1; }
+  55%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+@media (max-width: 760px) {
+  html.fx-hero .hero-layout { flex-direction: column; align-items: flex-start; gap: 2.2rem; }
+  html.fx-hero .hero-section { padding-bottom: 4.5rem; }
+  html.fx-hero .carousel { width: clamp(180px, 55vw, 260px); height: clamp(180px, 55vw, 260px); }
+  html.fx-hero .hero-carousel { align-self: flex-end; }
+}
+
+/* ---------- marquee ---------- */
+.marquee-strip {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  border-block: 1px solid var(--border);
+  padding-block: 1.1rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.fx-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+.marquee-strip:hover .fx-marquee-track { animation-play-state: paused; }
+.fx-marquee-group { display: flex; align-items: center; flex-shrink: 0; }
+.fx-marquee-item {
+  padding-inline: 1.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--muted);
+  transition: color 300ms ease;
+}
+.fx-marquee-item:hover { color: var(--fg); -webkit-text-stroke-color: var(--fg); }
+.fx-marquee-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ---------- pinned entries (Background) ---------- */
+/* sticky needs the body not to be a scroll container */
+html.fx-pinned body { overflow-x: clip; }
+
+html.fx-pinned .entry-row.is-pinned {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 999px) {
+  html.fx-pinned .entry-aside { display: contents; }
+  html.fx-pinned .is-pinned > .entry-body,
+  html.fx-pinned .is-pinned .entry-top,
+  html.fx-pinned .is-pinned .entry-meta { grid-column: 2; }
+  html.fx-pinned .is-pinned .entry-logo { grid-column: 1; grid-row: 1 / span 3; }
+  html.fx-pinned .is-pinned .entry-top  { grid-row: 1; }
+  html.fx-pinned .is-pinned .entry-meta { grid-row: 2; }
+  html.fx-pinned .is-pinned > .entry-body { grid-row: 3; }
+}
+
+@media (min-width: 1000px) {
+  html.fx-pinned .entry-row.is-pinned {
+    grid-template-columns: minmax(220px, 290px) minmax(0, 1fr);
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+    padding-block: 1.7rem;
+  }
+  html.fx-pinned .entry-aside {
+    display: block;
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  html.fx-pinned .entry-aside .entry-logo { margin-bottom: 0.9rem; }
+  html.fx-pinned .entry-aside .entry-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  html.fx-pinned .entry-aside .entry-role { margin-top: 0.4rem; }
+  html.fx-pinned .entry-aside .entry-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    margin-top: 0.4rem;
+  }
+  html.fx-pinned .is-pinned > .entry-body { grid-column: 2; grid-row: 1; }
+}
+
+/* ---------- mesh ---------- */
+html.fx-mesh #bg-mesh {
+  transform: translate3d(0, var(--mesh-shift, 0px), 0) scale(1.06);
+  transform-origin: center;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail, .rail-link { transition: none; }
+  .fx-marquee-track, .scroll-cue i { animation: none; }
+  html.fx-hero .hero-text, html.fx-hero .hero-carousel { transform: none; opacity: 1; }
+}
+
+/* ---------- rail: focus-area filters (Projects page) ---------- */
+.rail-filters { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+.rail-filters .rail-eyebrow { margin-bottom: 0.1rem; }
+.rail-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-text);
+  font-size: var(--text-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  cursor: none;
+  transition: color 250ms ease;
+}
+.rail-filter i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--c, 128, 128, 128), 0.8);
+  background: transparent;
+  transition: background 250ms ease, box-shadow 250ms ease;
+}
+.rail-filter:hover { color: var(--fg); }
+.rail-filter.active { color: var(--fg); }
+.rail-filter.active i {
+  background: rgb(var(--c, 128, 128, 128));
+  box-shadow: 0 0 0 4px rgba(var(--c, 128, 128, 128), 0.18);
+}
+
+
+/* ---------- neon streaks background ---------- */
+.streaks {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 1200ms ease;
+  /* soften the streaks behind the centred column */
+  -webkit-mask-image: radial-gradient(ellipse 52% 80% at 50% 50%,
+      rgba(0, 0, 0, var(--center-dim, 0.7)) 0%, rgba(0, 0, 0, var(--center-dim, 0.7)) 40%, #000 100%);
+          mask-image: radial-gradient(ellipse 52% 80% at 50% 50%,
+      rgba(0, 0, 0, var(--center-dim, 0.7)) 0%, rgba(0, 0, 0, var(--center-dim, 0.7)) 40%, #000 100%);
+}
+.streaks.ready { opacity: 1; }
+
+.streaks-breath {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(var(--sx, 0px), var(--sy, 0px), 0) scale(1.06);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.streak-base, .streak-flow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.streak-base { opacity: 0; transition: opacity 1000ms ease; }
+.streak-base.on { opacity: 1; }
+.streak-base.instant { transition: none; }
+
+/* ---------- readability: frosted glass behind the content column ---------- */
+.page-glass {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: min(calc(var(--max-w, 900px) + 9rem), 100vw);
+  transform: translateX(-50%);
+  pointer-events: none;
+
+  /* Subtle, seamless glass */
+  background: color-mix(in oklch, var(--bg) 18%, transparent);
+
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+  backdrop-filter: blur(12px) saturate(1.15);
+
+  /* Keep the edges invisible */
+  -webkit-mask-image: linear-gradient(
+    90deg, transparent, #000 7%, #000 93%, transparent
+  );
+  mask-image: linear-gradient(
+    90deg, transparent, #000 7%, #000 93%, transparent
+  );
+}
+
+/* a soft halo in the page colour around every glyph: a local scrim that never shifts the layout */
+html.fx-streaks .wrap {
+  text-shadow: 0 0 14px var(--bg), 0 0 7px var(--bg), 0 0 2px var(--bg);
+}
+html.fx-streaks .marquee-strip,
+html.fx-streaks .marquee-strip * { text-shadow: none; }
+
+/* body copy and small labels step up one shade so they survive a bright streak behind them */
+html.fx-streaks { --text-soft: color-mix(in oklch, var(--muted) 60%, var(--fg)); }
+html.fx-streaks .bio,
+html.fx-streaks #about .about-text-only > p,
+html.fx-streaks #about .about-text-only .skills-line,
+html.fx-streaks .pc-summary,
+html.fx-streaks .entry-bullets li,
+html.fx-streaks .entry-meta,
+html.fx-streaks .entry-meta *,
+html.fx-streaks .section-label { color: var(--text-soft); }
+
+/* (labels below keep the lighter --muted tone) */
+html.fx-streaks .pc-date,
+html.fx-streaks .drawer-meta,
+html.fx-streaks .entry-date,
+html.fx-streaks .entry-note,
+html.fx-streaks .rail-link,
+html.fx-streaks .rail-ext,
+html.fx-streaks .rail-eyebrow,
+html.fx-streaks .rail-filter { color: var(--muted); }
+html.fx-streaks .rail-link.active,
+html.fx-streaks .rail-ext:hover,
+html.fx-streaks .rail-filter.active,
+html.fx-streaks .rail-filter:hover,
+html.fx-streaks .rail-link:hover { color: var(--fg); }
+
+/* cards sit on the glass, so give them a firmer surface */
+html.fx-streaks .project-card {
+  background: color-mix(in oklch, var(--bg) 80%, var(--fg) 4%);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+}
+/* the full-width marquee strip gets its own frost */
+html.fx-streaks .marquee-strip {
+  background: color-mix(in oklch, var(--bg) 50%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaks, .streaks-breath, .streak-base { transition: none; }
+}
+
+/* keep rail text legible when a streak glows behind it */
+.rail { text-shadow: 0 0 10px var(--bg), 0 0 4px var(--bg), 0 0 2px var(--bg); }
+
+/* ================= legibility pass ================= */
+
+/* type: sturdier weight, bigger small text, brighter body copy */
+html.fx-streaks {
+  --text-2xs: clamp(0.75rem,   0.73rem + 0.075vw, 0.8125rem);
+  --text-xs:  clamp(0.8125rem, 0.79rem + 0.1vw,   0.9rem);
+  --text-soft: color-mix(in oklch, var(--fg) 88%, var(--muted));
+}
+html.fx-streaks body { font-weight: 400; }
+html.fx-streaks .section-label,
+html.fx-streaks .skill-label { font-weight: 500; }
+
+/* colour: lift the secondary greys (dates, rail links, notes) */
+html.fx-streaks:not(.light) { --muted: oklch(78% 0.003 255); }
+html.fx-streaks.light       { --muted: oklch(40% 0.001 80); }
+
+/* glass: firmer, blurrier frost behind the content column */
+.page-glass {
+  background: color-mix(in oklch, var(--bg) 20%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+          backdrop-filter: blur(10px) saturate(1.1);
+}
+
+/* halo: tighter and stronger instead of wide and smudgy */
+html.fx-streaks .wrap {
+  text-shadow: 0 0 6px var(--bg), 0 0 6px var(--bg), 0 0 2px var(--bg);
+}
+.rail {
+  text-shadow: 0 0 6px var(--bg), 0 0 6px var(--bg), 0 0 2px var(--bg);
+}
+
+/* panels: give About and Background entries a surface, like the project cards */
+html.fx-streaks #about .about-text-only,
+html.fx-streaks .entry-list {
+  margin-inline: -1.25rem;      /* panel grows outward so the text doesn't move */
+  padding-inline: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--bg) 2.5%, transparent);
+  -webkit-backdrop-filter: blur(2.5px);
+          backdrop-filter: blur(2.5px);
+}
+
+/* marquee: JS drives the motion now, and the strip is draggable */
+.fx-marquee-track { animation: none; will-change: transform; }
+.marquee-strip {
+  touch-action: pan-y;            /* horizontal drags move the strip, vertical swipes still scroll the page */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* rails get their own frosted panel so they stay readable over the ribbons */
+.rail {
+  padding: 1.1rem 1.2rem;
+  border-radius: 14px;
+  background: color-mix(in oklch, var(--bg) 2.5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 2.5%, transparent);
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.1);
+          backdrop-filter: blur(1.5px) saturate(1.1);
+}
+
+/* slightly heavier, brighter labels inside it */
+.rail-link, .rail-filter, .rail-eyebrow { font-weight: 500; }

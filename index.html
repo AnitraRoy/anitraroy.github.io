@@ -7,14 +7,16 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="images/logo.svg">
   <link rel="stylesheet" href="styles/style.css" />
+  <link rel="stylesheet" href="/styles/immersive.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <script>
     (function() {
       if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
     })();
   </script>
+  <script src="/scripts/immersive.js"></script>
 </head>
 
 <div class="cursor-dot"></div>
@@ -68,9 +70,8 @@
               <span class="tagline-title" id="typed-tagline"></span><span class="cursor-blink">|</span>
             </p>
             <p class="bio">
-              I build simple solutions to complex problems. <br>
-              Studying Industrial Engineering at the University of Toronto, with minors in 
-              Artificial Intelligence &amp; Engineering Business.
+              Studying Industrial Engineering at the University of Toronto,
+              with minors in Artificial Intelligence &amp; Engineering Business.
             </p>
           </div>
           <div class="hero-carousel">
@@ -79,7 +80,6 @@
               <img src="images/about2.png" alt="Anitra Roy" class="carousel-image" />
               <img src="images/about3.png" alt="Anitra Roy" class="carousel-image" />
               <img src="images/about4.png" alt="Anitra Roy" class="carousel-image" />
-              <img src="images/about5.png" alt="Anitra Roy" class="carousel-image" />
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@
         <div class="about-text-only fade-in" style="border-top: 1px solid var(--border); padding-top: 1.25rem;">
           <p>
             I&apos;m an Industrial Engineer who enjoys using data and smart 
-            problem-solving to improve how things work. I focus on optimizing 
+            problem-solving to improve how things work. <br> I focus on optimizing 
             processes and making better decisions through practical, scalable 
             solutions that actually deliver results.
           </p>
@@ -108,7 +108,7 @@
           </div>
           <div class="skills-block">
             <p class="skill-label">Interests</p>
-            <p class="skills-line">Data Science, Machine Learning, Artificial Intelligence, Sustainable Systems</p>
+            <p class="skills-line"> Artificial Intelligence, Data Science, Machine Learning</p>
           </div>
         </div>
       </section>

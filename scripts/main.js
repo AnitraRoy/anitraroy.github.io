@@ -729,14 +729,14 @@ window.addEventListener('resize', () => {
   if (!filters) return;
 
   const allBtn = filters.querySelector('[data-filter="all"]');
-  const projects = document.querySelectorAll('#projects .entry-row');
+  const projects = document.querySelectorAll('#projects .project-card');
 
   function updatePillHighlights(activeFilters) {
     projects.forEach(row => {
       const pills = row.querySelectorAll('.skill-pill');
 
       pills.forEach(pill => {
-        const tag = pill.textContent.trim();
+        const tag = pill.dataset.tag || pill.textContent.trim();
         const match = activeFilters.includes(tag);
 
         pill.classList.toggle('pill-active', match);
@@ -752,17 +752,11 @@ window.addEventListener('resize', () => {
 
     const allBtn = filters.querySelector('[data-filter="all"]');
 
-    if (filter === 'all') {
-      // reset everything
-      filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      allBtn.classList.add('active');
-    } else {
-      // toggle clicked filter
-      btn.classList.toggle('active');
-
-      // remove "all" if any specific filter is active
-      allBtn.classList.remove('active');
-    }
+    // One focus area at a time: click to show it, click it again to go back to all
+    const wasActive = btn.classList.contains('active');
+    filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (filter === 'all' || wasActive) allBtn.classList.add('active');
+    else btn.classList.add('active');
 
     // collect active filters
     let activeFilters = Array.from(
@@ -776,7 +770,7 @@ window.addEventListener('resize', () => {
     }
 
     // filter projects
-    const projects = document.querySelectorAll('#projects .entry-row');
+    const projects = document.querySelectorAll('#projects .project-card');
 
     let visibleIndex = 0;
     projects.forEach(row => {
@@ -822,3 +816,603 @@ document.querySelectorAll('.nav-link').forEach(link => {
     navLinksMenu.classList.remove('open');
   });
 });
+
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const rows = Array.from(document.querySelectorAll('.entry-row'));
+
+  // ---------- Collapsible bullets ----------
+  let uid = 0;
+  rows.forEach(row => {
+    const ul = row.querySelector('.entry-bullets');
+    if (!ul) return;
+    const items = Array.from(ul.children);
+    if (items.length < 1) return;
+
+    const id = 'more-' + (++uid);
+    const more = document.createElement('div');
+    more.className = 'bullets-more';
+    more.id = id;
+    more.setAttribute('inert', '');
+    const inner = document.createElement('div');
+    inner.className = 'bullets-more-inner';
+    const restUl = document.createElement('ul');
+    restUl.className = 'entry-bullets';
+    items.slice(0).forEach(li => restUl.appendChild(li));
+    inner.appendChild(restUl);
+    more.appendChild(inner);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'more-btn';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', id);
+    const n = items.length;
+    btn.innerHTML = `<span class="more-plus">+</span><span class="more-text">${n} more detail${n > 1 ? 's' : ''}</span>`;
+
+    btn.addEventListener('click', () => {
+      const open = !more.classList.contains('open');
+      more.classList.toggle('open', open);
+      open ? more.removeAttribute('inert') : more.setAttribute('inert', '');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.classList.toggle('open', open);
+      btn.querySelector('.more-text').textContent = open ? 'show less' : `${n} more detail${n > 1 ? 's' : ''}`;
+    });
+
+    ul.after(more);
+    more.after(btn);
+  });
+
+  // ---------- Scroll-drawn timeline (Experience) ----------
+  const tlList = document.querySelector('#experience .entry-list');
+  if (tlList) {
+    tlList.classList.add('timeline');
+    const tlRows = Array.from(tlList.querySelectorAll('.entry-row'));
+    const dots = tlRows.map(r => {
+      const d = document.createElement('span');
+      d.className = 'tl-dot';
+      d.setAttribute('aria-hidden', 'true');
+      r.appendChild(d);
+      return d;
+    });
+
+    function updateTimeline() {
+      const rect = tlList.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const startScroll = rect.top + scrollY - window.innerHeight * 0.6;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const endScroll = Math.max(startScroll + 1, maxScroll);
+      const prog = Math.max(0, Math.min(1, (scrollY - startScroll) / (endScroll - startScroll)));
+
+      tlList.style.setProperty('--tl', reduced ? 1 : prog.toFixed(4));
+
+      tlRows.forEach((r, i) => {
+        const dotY = r.getBoundingClientRect().top - rect.top + 36;
+
+        dots[i].classList.toggle(
+          'on',
+          reduced || dotY <= prog * rect.height
+        );
+      });
+    }
+    window.addEventListener('scroll', updateTimeline, { passive: true });
+    window.addEventListener('resize', updateTimeline);
+    updateTimeline();
+  }
+
+  // ---------- Stacked hero photo deck ----------
+  const oldCarousel = document.querySelector('.hero-carousel .carousel');
+  if (oldCarousel) {
+    const carousel = oldCarousel.cloneNode(true); // drops the old fade listeners
+    oldCarousel.replaceWith(carousel);
+    carousel.classList.add('deck');
+    carousel.setAttribute('role', 'button');
+    carousel.setAttribute('tabindex', '0');
+    carousel.setAttribute('aria-label', 'Photos of Anitra. Click to see the next one');
+
+    let order = Array.from(carousel.querySelectorAll('.carousel-image'));
+    order.forEach(img => img.classList.remove('active'));
+
+    function layoutDeck() {
+      order.forEach((img, i) => {
+        img.style.setProperty('--pos', i);
+        img.style.setProperty('--o', i < 3 ? (1 - i * 0.28).toFixed(2) : 0);
+      });
+    }
+    function nextCard() {
+      order.push(order.shift());
+      layoutDeck();
+    }
+    layoutDeck();
+
+    let timer = setInterval(nextCard, 4500);
+    const restart = () => { clearInterval(timer); timer = setInterval(nextCard, 4500); };
+    carousel.addEventListener('click', () => { nextCard(); restart(); });
+    carousel.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nextCard(); restart(); }
+    });
+    carousel.addEventListener('mouseenter', () => clearInterval(timer));
+    carousel.addEventListener('mouseleave', restart);
+  }
+})();
+
+(function () {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Page transitions ----------
+  const normPath = p => p.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+
+  function navigate(url) {
+    const u = new URL(url, location.href);
+    // Same page: just scroll to the hash (or top)
+    if (u.origin === location.origin && normPath(u.pathname) === normPath(location.pathname) && u.search === location.search) {
+      const target = u.hash && document.getElementById(u.hash.slice(1));
+      if (target) {
+        const top = target.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: reduced ? 'auto' : 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+      }
+      return;
+    }
+    if (reduced) { location.href = u.href; return; }
+    document.body.classList.add('page-leaving');
+    setTimeout(() => { location.href = u.href; }, 220);
+  }
+
+  document.addEventListener('click', e => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+    const u = new URL(a.href, location.href);
+    if (u.origin !== location.origin) return;
+    e.preventDefault();
+    navigate(u.href);
+  });
+
+  // Coming back via the browser's back button should never stay faded out
+  window.addEventListener('pageshow', e => {
+    if (e.persisted) document.body.classList.remove('page-leaving');
+  });
+
+  // ---------- Back to top with progress ring ----------
+  const CIRC = 2 * Math.PI * 15;
+  const topBtn = document.createElement('button');
+  topBtn.type = 'button';
+  topBtn.className = 'to-top';
+  topBtn.setAttribute('aria-label', 'Back to top');
+  topBtn.innerHTML =
+    '<svg viewBox="0 0 36 36" aria-hidden="true">' +
+      '<circle class="to-top-track" cx="18" cy="18" r="15"></circle>' +
+      '<circle class="to-top-ring" cx="18" cy="18" r="15" stroke-dasharray="' + CIRC.toFixed(2) + '" stroke-dashoffset="' + CIRC.toFixed(2) + '"></circle>' +
+      '<path class="to-top-arrow" d="M18 24V12M12.5 17.5L18 12l5.5 5.5"></path>' +
+    '</svg>';
+  document.body.appendChild(topBtn);
+  const ring = topBtn.querySelector('.to-top-ring');
+
+  function updateToTop() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const p = max > 0 ? Math.min(window.scrollY / max, 1) : 0;
+    ring.style.strokeDashoffset = (CIRC * (1 - p)).toFixed(2);
+    // Short pages get an earlier trigger so the button still appears
+    topBtn.classList.toggle('show', max > 80 && window.scrollY > Math.min(400, max * 0.4));
+  }
+  window.addEventListener('scroll', updateToTop, { passive: true });
+  window.addEventListener('resize', updateToTop);
+  updateToTop();
+  topBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+  });
+
+  // ---------- Copy email + toast ----------
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  document.body.appendChild(toast);
+  let toastTimer = null;
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (err) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        return ok;
+      } catch (e) { return false; }
+    }
+  }
+
+  const EMAIL = 'royanitra04@gmail.com';
+  async function copyEmail() {
+    const ok = await copyText(EMAIL);
+    showToast(ok ? 'Email copied to clipboard' : EMAIL);
+  }
+
+  document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+    a.title = 'Click to copy email';
+    a.addEventListener('click', e => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return; // modifier-click still opens mail app
+      e.preventDefault();
+      copyEmail();
+    });
+  });
+
+  // ---------- Command palette ----------
+  const FILTERS = [
+    { slug: 'data-science', label: 'Data Science', kw: 'analytics statistics optimization' },
+    { slug: 'ai-ml', label: 'AI/ML', kw: 'machine learning artificial intelligence deep learning' },
+    { slug: 'full-stack', label: 'Full-Stack', kw: 'web app frontend backend software' },
+  ];
+  const openProj = id => (window.openProject ? window.openProject(id) : navigate('/projects#' + id));
+  const COMMANDS = [
+    // Pages
+    { type: 'Page', label: 'Home', kw: 'hero start', run: () => navigate('/') },
+    { type: 'Page', label: 'Background', kw: 'education experience resume', run: () => navigate('/background') },
+    { type: 'Page', label: 'Projects', kw: 'work portfolio', run: () => navigate('/projects') },
+    // Sections
+    { type: 'Section', label: 'About', kw: 'bio skills interests', run: () => navigate('/#about') },
+    { type: 'Section', label: 'Education', kw: 'university toronto degree', run: () => navigate('/background#background') },
+    { type: 'Section', label: 'Experience', kw: 'work jobs ttc uhn iit ottawa', run: () => navigate('/background#experience') },
+    // Projects are added automatically from the projects page (see loadProjects below)
+    // Focus-area filters
+    ...FILTERS.map(f => ({ type: 'Filter', label: 'Show ' + f.label + ' projects', kw: 'filter focus ' + f.label + ' ' + f.kw, run: () => navigate('/projects?filter=' + f.slug) })),
+    // Actions
+    { type: 'Action', label: 'Toggle light / dark theme', kw: 'mode appearance', run: () => document.getElementById('theme-toggle')?.click() },
+    { type: 'Action', label: 'Copy email address', kw: 'contact mail', run: copyEmail },
+    { type: 'Action', label: 'Open GitHub', kw: 'code profile', url: 'https://github.com/AnitraRoy' },
+    { type: 'Action', label: 'Open LinkedIn', kw: 'profile connect', url: 'https://linkedin.com/in/AnitraRoy' },
+    { type: 'Action', label: 'Scroll to top', kw: 'back', run: () => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }) },
+  ];
+
+  // Project entries come from the cards on the projects page itself, so they never go stale
+  let projectsLoaded = false;
+  function addProjectCommands(root) {
+    root.querySelectorAll('.project-card').forEach(card => {
+      const id = card.id;
+      const title = card.querySelector('.pc-title')?.textContent.trim();
+      if (!id || !title || COMMANDS.some(c => c.projId === id)) return;
+      const tags = Array.from(card.querySelectorAll('.skill-pill')).map(x => x.textContent.trim()).join(' ');
+      const summary = card.querySelector('.pc-summary')?.textContent || '';
+      COMMANDS.push({ type: 'Project', label: title, kw: tags + ' ' + summary, projId: id, run: () => openProj(id) });
+    });
+  }
+  async function loadProjects() {
+    if (projectsLoaded) return;
+    projectsLoaded = true;
+    if (document.querySelector('.project-card')) {
+      addProjectCommands(document);
+    } else {
+      try {
+        const res = await fetch('/projects/');
+        if (!res.ok) throw new Error('not ok');
+        addProjectCommands(new DOMParser().parseFromString(await res.text(), 'text/html'));
+      } catch (e) { projectsLoaded = false; }
+    }
+    if (typeof overlay !== 'undefined' && !overlay.hidden) render();
+  }
+  setTimeout(loadProjects, 1200);
+
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+  // Markup
+  const overlay = document.createElement('div');
+  overlay.className = 'cmdk-overlay';
+  overlay.hidden = true;
+  overlay.innerHTML =
+    '<div class="cmdk" role="dialog" aria-modal="true" aria-label="Command palette">' +
+      '<input class="cmdk-input" type="text" placeholder="Search pages, projects, actions…" autocomplete="off" spellcheck="false" ' +
+        'role="combobox" aria-expanded="true" aria-controls="cmdk-list" aria-autocomplete="list" />' +
+      '<ul class="cmdk-list" id="cmdk-list" role="listbox"></ul>' +
+      '<div class="cmdk-foot"><span>↑↓ navigate</span><span>↵ select</span><span>esc close</span></div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+
+  const input = overlay.querySelector('.cmdk-input');
+  const list  = overlay.querySelector('.cmdk-list');
+  let results = [];
+  let sel = 0;
+
+  function score(cmd, q) {
+    const label = cmd.label.toLowerCase();
+    const hay = (label + ' ' + (cmd.kw || '') + ' ' + cmd.type).toLowerCase();
+    const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+    let s = 0;
+    for (const t of tokens) {
+      if (!hay.includes(t)) return -1;
+      s += label.startsWith(t) ? 3 : label.includes(t) ? 2 : 1;
+    }
+    return s;
+  }
+
+  function render() {
+    const q = input.value.trim();
+    results = q
+      ? COMMANDS.map(c => ({ c, s: score(c, q) })).filter(x => x.s >= 0).sort((a, b) => b.s - a.s).map(x => x.c)
+      : COMMANDS.filter(c => ['Page', 'Section', 'Action'].includes(c.type));
+    sel = 0;
+    list.textContent = '';
+    if (!results.length) {
+      const li = document.createElement('li');
+      li.className = 'cmdk-empty';
+      li.textContent = 'No results';
+      list.appendChild(li);
+      input.removeAttribute('aria-activedescendant');
+      return;
+    }
+    results.forEach((c, i) => {
+      const li = document.createElement('li');
+      li.className = 'cmdk-item';
+      li.id = 'cmdk-item-' + i;
+      li.setAttribute('role', 'option');
+      const l = document.createElement('span');
+      l.className = 'cmdk-label';
+      l.textContent = c.label;
+      const t = document.createElement('span');
+      t.className = 'cmdk-type';
+      t.textContent = c.url ? c.type + ' ↗' : c.type;
+      li.append(l, t);
+      li.addEventListener('mousemove', () => { if (sel !== i) { sel = i; highlight(false); } });
+      li.addEventListener('click', () => choose(i));
+      list.appendChild(li);
+    });
+    highlight(true);
+  }
+
+  function highlight(scroll) {
+    list.querySelectorAll('.cmdk-item').forEach((li, i) => {
+      const on = i === sel;
+      li.classList.toggle('active', on);
+      li.setAttribute('aria-selected', String(on));
+      if (on) {
+        input.setAttribute('aria-activedescendant', li.id);
+        if (scroll !== false) li.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }
+
+  function openPalette() {
+    if (!overlay.hidden) return;
+    loadProjects();
+    overlay.hidden = false;
+    input.value = '';
+    render();
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+    input.focus();
+  }
+
+  function closePalette() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { overlay.hidden = true; }, 180);
+  }
+
+  function choose(i) {
+    const c = results[i];
+    if (!c) return;
+    closePalette();
+    if (c.url) window.open(c.url, '_blank', 'noopener');
+    else setTimeout(c.run, 120);
+  }
+
+  input.addEventListener('input', render);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(sel + 1, results.length - 1); highlight(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(sel - 1, 0); highlight(); }
+    else if (e.key === 'Enter') { e.preventDefault(); choose(sel); }
+    else if (e.key === 'Tab') { e.preventDefault(); }
+  });
+  overlay.addEventListener('mousedown', e => { if (e.target === overlay) closePalette(); });
+
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      overlay.hidden ? openPalette() : closePalette();
+    } else if (e.key === 'Escape' && !overlay.hidden) {
+      closePalette();
+    }
+  });
+
+  // Nav trigger button
+  const group = document.querySelector('.nav-right-group');
+  if (group) {
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'cmdk-trigger';
+    trigger.setAttribute('aria-label', 'Open command palette');
+    trigger.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5" stroke-linecap="round"/></svg>' +
+      '<kbd>' + (isMac ? '⌘K' : 'Ctrl K') + '</kbd>';
+    trigger.addEventListener('click', openPalette);
+    group.insertBefore(trigger, document.getElementById('theme-toggle'));
+  }
+
+  // ---------- Projects page: honour ?filter=data-science (focus-area slug) ----------
+  const wanted = new URLSearchParams(location.search).get('filter');
+  if (wanted) {
+    const btn = document.querySelector('#project-filters .filter-btn[data-filter="' + CSS.escape(wanted) + '"]');
+    if (btn) btn.click();
+  }
+})();
+
+/* -- Projects page: card accents + quick-view drawer -- */
+(function () {
+  const cards = Array.from(document.querySelectorAll('.project-card'));
+  if (!cards.length) return;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Accent colour follows the card's first focus-area pill, so reassigning pills recolours the card too
+  cards.forEach(card => {
+    const pill = card.querySelector('.skill-pill');
+    if (pill) card.style.setProperty('--accent', pill.style.getPropertyValue('--pill-color').trim());
+  });
+
+  // ---- Drawer markup ----
+  const overlay = document.createElement('div');
+  overlay.className = 'drawer-overlay';
+  overlay.hidden = true;
+  overlay.innerHTML =
+    '<aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">' +
+      '<button type="button" class="drawer-close" aria-label="Close project details">&times;</button>' +
+      '<div class="drawer-scroll">' +
+        '<div class="pc-cover drawer-cover"><img alt="" /></div>' +
+        '<div class="drawer-body">' +
+          '<p class="drawer-meta"><span class="drawer-date"></span><span class="drawer-count"></span></p>' +
+          '<h3 class="drawer-title" id="drawer-title"></h3>' +
+          '<div class="project-tags drawer-tags"></div>' +
+          '<ul class="entry-bullets drawer-bullets"></ul>' +
+          '<a class="drawer-cta" target="_blank" rel="noopener noreferrer"><span></span><b aria-hidden="true">&#8599;</b></a>' +
+        '</div>' +
+      '</div>' +
+      '<div class="drawer-nav">' +
+        '<button type="button" class="drawer-step drawer-prev"><i aria-hidden="true">&larr;</i><span></span></button>' +
+        '<button type="button" class="drawer-step drawer-next"><span></span><i aria-hidden="true">&rarr;</i></button>' +
+      '</div>' +
+    '</aside>';
+  document.body.appendChild(overlay);
+
+  const drawer   = overlay.querySelector('.drawer');
+  const scroller = overlay.querySelector('.drawer-scroll');
+  const q = sel => overlay.querySelector(sel);
+  const closeBtn = q('.drawer-close');
+  const prevBtn  = q('.drawer-prev');
+  const nextBtn  = q('.drawer-next');
+
+  let current = null;
+  let opener = null;
+
+  const visible = () => cards.filter(c => !c.classList.contains('hidden'));
+  const titleOf = c => c.querySelector('.pc-title').textContent.trim();
+  const shortTitle = c => c.dataset.short || titleOf(c).split(/[:(]/)[0].trim();
+  const pad2 = n => String(n).padStart(2, '0');
+
+  function fill(card) {
+    ['--accent', '--cover-bg', '--cover-fit', '--cover-pad'].forEach(v => {
+      const val = card.style.getPropertyValue(v);
+      if (val) drawer.style.setProperty(v, val);
+    });
+    const img = q('.drawer-cover img');
+    const src = card.querySelector('.pc-cover img');
+    img.src = src.currentSrc || src.src;
+    img.alt = src.alt;
+    q('.drawer-date').textContent = card.querySelector('.pc-date').textContent;
+    q('.drawer-title').textContent = titleOf(card);
+    q('.drawer-tags').innerHTML = card.querySelector('.project-tags').innerHTML;
+    q('.drawer-bullets').innerHTML = card.querySelector('.pc-detail .entry-bullets').innerHTML;
+    const cta = q('.drawer-cta');
+    cta.href = card.dataset.link;
+    cta.querySelector('span').textContent = card.dataset.cta || 'View project';
+
+    const list = visible();
+    const i = list.indexOf(card);
+    q('.drawer-count').textContent = i >= 0 ? pad2(i + 1) + ' / ' + pad2(list.length) : '';
+    const prev = i > 0 ? list[i - 1] : null;
+    const next = i >= 0 && i < list.length - 1 ? list[i + 1] : null;
+    prevBtn.disabled = !prev; nextBtn.disabled = !next;
+    prevBtn.querySelector('span').textContent = prev ? shortTitle(prev) : '';
+    nextBtn.querySelector('span').textContent = next ? shortTitle(next) : '';
+
+    scroller.scrollTop = 0;
+    if (!reduced) { scroller.classList.remove('swap'); void scroller.offsetWidth; scroller.classList.add('swap'); }
+  }
+
+  function setHash(id) {
+    const base = location.pathname + location.search;
+    try { history.replaceState(null, '', id ? base + '#' + id : base); } catch (e) {}
+  }
+
+  function openCard(card, trigger) {
+    if (!card) return;
+    // If a filter currently hides this project, reset filters so it can be shown
+    if (card.classList.contains('hidden')) document.querySelector('#project-filters [data-filter="all"]')?.click();
+    const wasOpen = !overlay.hidden;
+    current = card;
+    if (trigger) opener = trigger;
+    fill(card);
+    setHash(card.id);
+    if (wasOpen) return;
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add('open'));
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus({ preventScroll: true });
+  }
+
+  function closeDrawer(skipHash) {
+    if (overlay.hidden) return;
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { overlay.hidden = true; }, 320);
+    if (!skipHash) setHash(null);
+    if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    current = null;
+  }
+
+  function step(dir) {
+    const list = visible();
+    const i = list.indexOf(current);
+    const target = list[i + dir];
+    if (target) openCard(target);
+  }
+
+  cards.forEach(card => {
+    card.querySelector('.pc-open').addEventListener('click', e => openCard(card, e.currentTarget));
+  });
+
+  closeBtn.addEventListener('click', () => closeDrawer());
+  prevBtn.addEventListener('click', () => step(-1));
+  nextBtn.addEventListener('click', () => step(1));
+  overlay.addEventListener('mousedown', e => { if (e.target === overlay) closeDrawer(); });
+
+  document.addEventListener('keydown', e => {
+    if (overlay.hidden) return;
+    const palette = document.querySelector('.cmdk-overlay');
+    if (palette && !palette.hidden) return; // palette has priority
+    if (e.key === 'Escape') closeDrawer();
+    else if (e.key === 'ArrowLeft') step(-1);
+    else if (e.key === 'ArrowRight') step(1);
+    else if (e.key === 'Tab') {
+      const f = Array.from(drawer.querySelectorAll('button:not([disabled]), a[href]'));
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // Touch: swipe left/right to move between projects
+  let sx = null;
+  drawer.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+  drawer.addEventListener('touchend', e => {
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    if (Math.abs(dx) > 70) step(dx < 0 ? 1 : -1);
+    sx = null;
+  });
+
+  // Deep links (#tesa) + the palette hook
+  const byId = id => cards.find(c => c.id === id);
+  window.openProject = id => openCard(byId(id));
+  const fromHash = () => {
+    const c = byId(location.hash.slice(1));
+    if (c) openCard(c); else closeDrawer(true);
+  };
+  window.addEventListener('hashchange', fromHash);
+  if (byId(location.hash.slice(1))) setTimeout(fromHash, 350);
+})();
