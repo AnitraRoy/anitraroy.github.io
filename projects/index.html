@@ -10,8 +10,7 @@
   <link rel="stylesheet" href="/styles/immersive.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Brawler&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-  <script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">  <script>
     (function() {
       if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
     })();
@@ -88,7 +87,7 @@
             </div>
             <div class="pc-body">
               <p class="pc-date">Oct 2026</p>
-              <h3 class="pc-title">truely.: Personalized Real-Time Communication Coach</h3>
+              <h3 class="pc-title">truely. — Personalized Real-Time Communication Coach</h3>
               <p class="pc-summary">Real-time coaching tool that tracks head pose in the browser and combines speech analytics with LLM inference to build personalized communication profiles.</p>
               <div class="project-tags">
                 <span class="skill-pill" data-tag="ai-ml" style="--pill-color: 139,92,246;">AI/ML</span>
@@ -97,16 +96,16 @@
             </div>
             <div class="pc-detail" hidden>
               <ul class="entry-bullets">
-              <li>Built a real-time computer vision pipeline with MediaPipe Face Landmarker to extract facial landmarks from webcam video and derive head pose, running fully in the browser.</li>
-              <li>Engineered per-user behavioural baselines using exponential moving average smoothing and z-score anomaly detection, with quality gating on face size and lighting to suppress false alerts.</li>
-              <li>Built an NLP and speech analytics pipeline integrating Apify web scraping, Cartesia speech-to-text, and LLM inference to extract quantitative speech metrics and generate personalized communication profiles.</li>
+              <li>Built an on-device, real-time computer vision pipeline using MediaPipe Face Landmarker to extract facial landmarks and estimate head pose from webcam streams, processing frames locally in the browser.</li>
+              <li>Engineered a personalized behavioral detection system using exponential moving average (EMA) smoothing, adaptive per-user baselines, and z-score anomaly detection, with face-size and lighting quality gates to suppress false alerts.</li>
+              <li>Integrated Apify, Cartesia, and Moss APIs to power web reference analysis, real-time speech transcription, AI voice coaching, and personalized communication insights.</li>
               </ul>
             </div>
             <button type="button" class="pc-open" aria-label="Open details for truely."></button>
           </article>
 
           <article class="project-card fade-in" id="tesa" data-short="TESA" data-tags="data-science full-stack" data-link="https://transitequityscenarioanalyzer.streamlit.app"
-                   style="--cover-bg: #ffffff; --cover-fit: contain; --cover-pad: 1.6rem;">
+                   style="--cover-bg: #ffffff; --cover-fit: cover; --cover-pad: 0;">
             <div class="pc-cover">
               <img src="/projects/tesa.png" alt="TESA" loading="lazy" decoding="async" />
             </div>
@@ -130,13 +129,13 @@
           </article>
 
           <article class="project-card fade-in" id="swapr" data-tags="full-stack" data-link="https://github.com/m4ggie/swapr" data-cta="View on GitHub"
-                   style="--cover-bg: #ffffff; --cover-fit: contain; --cover-pad: 1.6rem;">
+                   style="--cover-bg: #ffffff; --cover-fit: cover; --cover-pad: 0;">
             <div class="pc-cover">
               <img src="/projects/swapr.png" alt="Swapr" loading="lazy" decoding="async" />
             </div>
             <div class="pc-body">
               <p class="pc-date">Jan 2026 — Apr 2026</p>
-              <h3 class="pc-title">Swapr: Clothing Exchange Web App</h3>
+              <h3 class="pc-title">Swapr — Clothing Exchange Web App</h3>
               <p class="pc-summary">Peer-to-peer clothing exchange with a Spring Boot REST backend, a SQL data model, and a Dockerized Appsmith frontend.</p>
               <div class="project-tags">
                 <span class="skill-pill" data-tag="full-stack" style="--pill-color: 59,130,246;">Full-Stack</span>
@@ -159,11 +158,10 @@
             </div>
             <div class="pc-body">
               <p class="pc-date">Sep 2025 — Dec 2025</p>
-              <h3 class="pc-title">OptiCam: Speed Camera &amp; Collision Analysis in Toronto</h3>
+              <h3 class="pc-title">OptiCam — Speed Camera &amp; Collision Analysis in Toronto</h3>
               <p class="pc-summary">Clusters Toronto collision hotspots and optimizes speed camera placement, raising risk-weighted coverage from 27% to 68%.</p>
               <div class="project-tags">
                 <span class="skill-pill" data-tag="data-science" style="--pill-color: 16,185,129;">Data Science</span>
-                <span class="skill-pill" data-tag="ai-ml" style="--pill-color: 139,92,246;">AI/ML</span>
               </div>
             </div>
             <div class="pc-detail" hidden>
@@ -183,7 +181,7 @@
             </div>
             <div class="pc-body">
               <p class="pc-date">Jun 2025 — Aug 2025</p>
-              <h3 class="pc-title">EyeDentify: Retinal Disease Classification Using Deep Learning</h3>
+              <h3 class="pc-title">EyeDentify — Retinal Disease Classification Using Deep Learning</h3>
               <p class="pc-summary">CNN and SVM models that classify retinal disease from 12,000+ OCT scans with 91% multi-class accuracy.</p>
               <div class="project-tags">
                 <span class="skill-pill" data-tag="ai-ml" style="--pill-color: 139,92,246;">AI/ML</span>

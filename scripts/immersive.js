@@ -35,9 +35,10 @@
 
     // Light flowing through the ribbons (the ribbons themselves stay put)
     flow:        true,
-    flowSpeed:   170,           // how fast the light travels, in pixels per second
-    flowLength:  0.30,          // length of each streak of light (fraction of the longer screen side)
+    flowSpeed:   100,            // how fast the light travels, in pixels per second
+    flowLength:  0.25,          // length of each streak of light (fraction of the longer screen side)
     flowSpacing: 1.1,           // distance between streaks on one ribbon (fraction of the longer screen side)
+    pulseDim:    0.95,          // how much the bright one-off pulses fade while crossing behind your text (0 = not at all)
   };
 
   const root = document.documentElement;
@@ -456,8 +457,28 @@
     // The bends sit in the side margins, where the page content does not cover them: each side has a
     // ribbon bundle running down the margin, ducking in behind the content and back out again.
     const SCENE = [
-      { lanes: 2, reverse: false, pts: [[0.07, -0.10], [0.07, 0.45], [0.32, 0.45], [0.32, 0.89], [0.07, 0.89], [0.07, 1.10]] },
-      { lanes: 2, reverse: true,  pts: [[0.93, 1.10], [0.93, 0.55], [0.68, 0.55], [0.68, 0.11], [0.93, 0.11], [0.93, -0.10]] },
+      {
+        lanes: 2,
+        pts: [
+          [0.07, -0.10],
+          [0.07, 0.45],
+          [0.32, 0.45],
+          [0.32, 0.89],
+          [0.07, 0.89],
+          [0.07, 1.10]
+        ]
+      },
+      {
+        lanes: 2,
+        pts: [
+          [0.93, 1.10],
+          [0.93, 0.55],
+          [0.68, 0.55],
+          [0.68, 0.11],
+          [0.93, 0.11],
+          [0.93, -0.10]
+        ]
+      }
     ];
     // each lane flows a little differently, so the light never moves in lockstep
     const LANE_FEEL = [
@@ -537,6 +558,58 @@
     }
 
     // Geometry for the current window size, shared by the static ribbons and the flowing light.
+    // Walk a lane (straights + quarter-circle corners) and record points with their distance along it,
+    // so light can be placed "N pixels along the ribbon" and the nearest point to the cursor found.
+    function sampleLane(pts, off, R) {
+      const n = pts.length, U = [], N = [];
+      for (let i = 0; i < n - 1; i++) {
+        const dx = pts[i + 1][0] - pts[i][0], dy = pts[i + 1][1] - pts[i][1];
+        const len = Math.hypot(dx, dy) || 1;
+        U.push([dx / len, dy / len]);
+        N.push([-dy / len, dx / len]);
+      }
+      const P = pts.map((p, i) => {
+        let ox = 0, oy = 0;
+        if (i > 0)     { ox += N[i - 1][0]; oy += N[i - 1][1]; }
+        if (i < n - 1) { ox += N[i][0];     oy += N[i][1]; }
+        return [p[0] + ox * off, p[1] + oy * off];
+      });
+      const out = [];
+      let s = 0, pos = P[0].slice();
+      out.push({ x: pos[0], y: pos[1], s: 0 });
+      const straight = to => {
+        const dist = Math.hypot(to[0] - pos[0], to[1] - pos[1]);
+        const steps = Math.max(1, Math.ceil(dist / 10));
+        for (let k = 1; k <= steps; k++) {
+          const t = k / steps;
+          out.push({ x: pos[0] + (to[0] - pos[0]) * t, y: pos[1] + (to[1] - pos[1]) * t, s: s + dist * t });
+        }
+        s += dist; pos = to.slice();
+      };
+      for (let i = 1; i < n - 1; i++) {
+        const cross = U[i - 1][0] * U[i][1] - U[i - 1][1] * U[i][0];
+        const r = Math.max(6, R - Math.sign(cross) * off);
+        const u1 = U[i - 1], u2 = U[i];
+        const T1 = [P[i][0] - u1[0] * r, P[i][1] - u1[1] * r];
+        straight(T1);
+        const O = [T1[0] + u2[0] * r, T1[1] + u2[1] * r];
+        const steps = Math.max(4, Math.ceil(r * Math.PI / 2 / 8));
+        const arc = r * Math.PI / 2;
+        for (let k = 1; k <= steps; k++) {
+          const th = k / steps * Math.PI / 2;
+          out.push({
+            x: O[0] + r * (-u2[0] * Math.cos(th) + u1[0] * Math.sin(th)),
+            y: O[1] + r * (-u2[1] * Math.cos(th) + u1[1] * Math.sin(th)),
+            s: s + arc * k / steps,
+          });
+        }
+        s += arc;
+        pos = [P[i][0] + u2[0] * r, P[i][1] + u2[1] * r];
+      }
+      straight(P[n - 1]);
+      return { samples: out, length: s };
+    }
+
     function buildGeo() {
       const d = dims();
       const w = STREAKS.width * d.S;
@@ -549,7 +622,15 @@
           const off = (k - (b.lanes - 1) / 2) * gap;
           const path = new Path2D();
           trace(path, pts, off, R);
-          lanes.push({ pts, off, path, dir: b.reverse ? -1 : 1, feel: LANE_FEEL[lanes.length % LANE_FEEL.length] });
+          const sm = sampleLane(pts, off, R);
+          lanes.push({
+            pts,
+            off,
+            path,
+            samples: sm.samples,
+            length: sm.length,
+            feel: LANE_FEEL[lanes.length % LANE_FEEL.length]
+          });
         }
       });
       return { d, w, R, lanes };
@@ -634,6 +715,17 @@
     let flowRGB = STREAKS.color.slice();
     let flowI = STREAKS.idle;
 
+    let pcv = null, pctx = null;        // pulses are drawn on their own layer, so they can be dimmed behind text
+    let colL = 0, colR = 0;             // the content column, in canvas pixels
+
+    function measureColumn() {
+      const g = document.querySelector('.page-glass') || document.querySelector('.wrap');
+      if (!g || !geo) { colL = colR = 0; return; }
+      const r = g.getBoundingClientRect();
+      colL = toCanvasPoint(r.left, 0)[0];
+      colR = toCanvasPoint(r.right, 0)[0];
+    }
+
     function sizeFlow() {
       const d = geo.d;
       const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
@@ -641,6 +733,12 @@
       flowCanvas.height = Math.round(d.H * dpr);
       fctx = flowCanvas.getContext('2d');
       fctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      pcv = document.createElement('canvas');          // pulses are soft light, so this layer runs at lower resolution
+      const ps = 0.6;
+      pcv.width = Math.round(flowCanvas.width * ps); pcv.height = Math.round(flowCanvas.height * ps);
+      pctx = pcv.getContext('2d');
+      pctx.setTransform(dpr * ps, 0, 0, dpr * ps, 0, 0);
+      measureColumn();
     }
 
     // Each streak of light is a tapered comet: a few overlapping dashes that share a leading edge.
@@ -651,6 +749,57 @@
       { f: 0.16, w: 0.13, a: 0.95 },
     ];
 
+    /* ---- one-off pulses: colour "pours", card hovers, page-transition surges ---- */
+    const pulses = [];
+    let scrollVel = 0;        // how fast (and which way) the page is scrolling, px per second
+    let hoverRGB = null;      // colour of the project card under the cursor
+
+    function toCanvasPoint(px, py) {
+      const r = breath.getBoundingClientRect();
+      return [(px - r.left) / r.width * geo.d.W, (py - r.top) / r.height * geo.d.H];
+    }
+    function nearest(ln, x, y) {
+      let best = null, bd = Infinity;
+      for (let i = 0; i < ln.samples.length; i++) {
+        const q = ln.samples[i], dd = (q.x - x) * (q.x - x) + (q.y - y) * (q.y - y);
+        if (dd < bd) { bd = dd; best = q; }
+      }
+      return { s: best.s, dist: Math.sqrt(bd) };
+    }
+    function addPulse(p) {
+      p.age = 0;
+      const reach = p.dir > 0 ? p.ln.length - p.s : p.s;
+      p.maxAge = (reach + p.len * 1.5) / p.v + 0.15;
+      if (pulses.length >= 40) pulses.shift();
+      pulses.push(p);
+    }
+    // Light spreads both ways along every ribbon from the point nearest (px, py); farther ribbons start later.
+    function pour(px, py, rgb, power, kind) {
+      if (!geo || !fctx || reduced || !STREAKS.flow) return;
+      const [x, y] = toCanvasPoint(px, py);
+      geo.lanes.forEach(ln => {
+        const near = nearest(ln, x, y);
+        [1, -1].forEach(dir => addPulse({
+          ln, s: near.s, dir, v: 900 * power + 300, len: 0.24 * geo.d.L,
+          rgb, a: power, delay: near.dist / 1500, kind,
+        }));
+      });
+    }
+    function stepPulses(dt) {
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i];
+        let t = dt;
+        if (p.delay > 0) {                       // still waiting: spend the frame, carry over whatever is left
+          p.delay -= dt;
+          if (p.delay > 0) continue;
+          t = -p.delay; p.delay = 0;
+        }
+        p.age += t;
+        p.s += p.dir * p.v * t;
+        if (p.age > p.maxAge) pulses.splice(i, 1);
+      }
+    }
+
     function drawFlow() {
       if (!fctx || !geo) return;
       const { d, w, lanes } = geo;
@@ -659,6 +808,7 @@
       const I = Math.min(1, flowI * 1.15);
       const rgb = flowRGB;
       const hot = mixc(rgb, [255, 255, 255], light ? 0.55 : 0.78);
+      const shrink = 1;
 
       fctx.save();
       fctx.lineCap = 'round';
@@ -667,13 +817,14 @@
 
       lanes.forEach(ln => {
         const f = ln.feel;
-        const length = STREAKS.flowLength * d.L * f.len;
+        const length = STREAKS.flowLength * d.L * f.len * shrink;
         const period = STREAKS.flowSpacing * d.L * f.per;
-        const head = mod(f.phase * period + ln.dir * STREAKS.flowSpeed * f.spd * flowClock, period);
+        const head = mod(f.phase * period + STREAKS.flowSpeed * f.spd * flowClock, period);
+        const dirE = 1;
         COMET.forEach((c, i) => {
           const len = length * c.f;
           fctx.setLineDash([len, Math.max(1, period - len)]);
-          fctx.lineDashOffset = ln.dir > 0 ? len - head : -head;
+          fctx.lineDashOffset = dirE > 0 ? len - head : -head;
           fctx.lineWidth = w * c.w;
           fctx.strokeStyle = rgba(i >= 2 ? hot : rgb, c.a * I);
           fctx.save();
@@ -682,7 +833,57 @@
           fctx.restore();
         });
       });
+
       fctx.restore();
+
+      // pulses: drawn on their own layer, faded where they cross the content column, then added on top
+      if (pulses.length && pctx) {
+        pctx.clearRect(0, 0, d.W, d.H);
+        pctx.save();
+        pctx.lineCap = 'round';
+        pctx.lineJoin = 'round';
+        pctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      pulses.forEach(p => {
+        if (p.delay > 0) return;
+        const fadeIn = Math.min(1, p.age / 0.12);
+        const fadeOut = Math.max(0, Math.min(1, (p.maxAge - p.age) / (p.maxAge * 0.35 + 0.001)));
+        const A = p.a * fadeIn * fadeOut;
+        if (A <= 0.01) return;
+        const big = p.ln.length + p.len * 4 + 2000;
+        const core = mixc(p.rgb, [255, 255, 255], light ? 0.6 : 0.85);
+        COMET.forEach((c, i) => {
+          const len = p.len * c.f;
+          pctx.setLineDash([len, big]);
+          pctx.lineDashOffset = p.dir > 0 ? len - p.s : -p.s;
+          pctx.lineWidth = w * c.w * 1.15;
+          pctx.strokeStyle = rgba(i >= 2 ? core : p.rgb, Math.min(1, c.a * 1.5) * A);
+          pctx.save();
+          pctx.translate(-w * 0.10, -w * 0.12);
+          pctx.stroke(p.ln.path);
+          pctx.restore();
+        });
+      });
+        pctx.restore();
+        if (STREAKS.pulseDim > 0 && colR > colL) {
+          const edge = Math.min(0.05 * (colR - colL), 60);
+          const grad = pctx.createLinearGradient(colL, 0, colR, 0);
+          const dim = STREAKS.pulseDim;
+          grad.addColorStop(0, 'rgba(0,0,0,0)');
+          grad.addColorStop(edge / (colR - colL), 'rgba(0,0,0,' + dim + ')');
+          grad.addColorStop(1 - edge / (colR - colL), 'rgba(0,0,0,' + dim + ')');
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          pctx.save();
+          pctx.globalCompositeOperation = 'destination-out';
+          pctx.fillStyle = grad;
+          pctx.fillRect(0, 0, d.W, d.H);
+          pctx.restore();
+        }
+        fctx.save();
+        fctx.setTransform(1, 0, 0, 1, 0, 0);
+        fctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+        fctx.drawImage(pcv, 0, 0, flowCanvas.width, flowCanvas.height);
+        fctx.restore();
+      }
     }
 
     function tickFlow(now) {
@@ -691,21 +892,106 @@
       if (now - lastFrame < 32) return;                    // about 30 frames a second is plenty
       const dt = Math.min((now - lastFrame) / 1000, 0.1);
       lastFrame = now;
-      flowClock += dt;
-      // ease the light toward the colour we are showing
-      flowRGB = mixc(flowRGB, current.rgb, 0.07);
-      flowI += (current.strength - flowI) * 0.07;
+
+      // scrolling influences speed, but never reverses the light.
+      scrollVel *= Math.exp(-dt / 0.45);
+
+      const sv = clamp(scrollVel / 1000, -1, 1);
+      const mul = clamp(1 + 2.6 * sv, 0.25, 3.6);
+
+      flowClock += dt * mul;
+
+      if (hoverRGB && document.querySelector('.drawer-overlay.open')) hoverRGB = null;
+      const tRGB = hoverRGB || current.rgb;
+      const tI = (hoverRGB ? Math.max(current.strength, 0.9) : current.strength) + 0.22 * Math.abs(sv);
+      flowRGB = mixc(flowRGB, tRGB, 0.07);
+      flowI += (tI - flowI) * 0.07;
+
+      stepPulses(dt);
       drawFlow();
     }
 
-    // test hook: lets the flow be paused at a chosen moment
+    // test hooks: pause the flow at a chosen moment and trigger effects on demand
     wrapEl.__freeze = t => { frozen = true; flowClock = t; flowRGB = current.rgb.slice(); flowI = current.strength; drawFlow(); };
+    wrapEl.__pour = (x, y, rgb) => pour(x, y, rgb, 1, 'pour');
+    wrapEl.__surge = k => surge(k);
+    wrapEl.__advance = dt => { stepPulses(dt); drawFlow(); };
+    wrapEl.__scrollVel = v => { scrollVel = v; };
+    wrapEl.__hover = rgb => { hoverRGB = rgb; };
+    wrapEl.__debug = () => ({
+      pulses: pulses.map(p => ({
+        lane: geo.lanes.indexOf(p.ln),
+        s: Math.round(p.s),
+        dir: p.dir,
+        delay: +p.delay.toFixed(2)
+      })),
+      lanes: geo.lanes.map(l => Math.round(l.length)),
+      scrollVel: Math.round(scrollVel)
+    });
+    wrapEl.__pointAt = (lane, sv) => { const sm = geo.lanes[lane].samples; let q = sm[0]; for (const t of sm) { if (t.s <= sv) q = t; else break; } return [q.x, q.y]; };
 
     /* ---- wiring ---- */
     const lift = rgb => rgb.map(v => Math.min(255, v + (255 - v) * 0.12));
+    let lastPointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, t: -1e9 };
+    document.addEventListener('pointerdown', e => {
+      lastPointer = { x: e.clientX, y: e.clientY, t: performance.now() };
+    }, { capture: true, passive: true });
+    // where a colour change "started": the click if there was one, otherwise the focused control
+    function originPoint() {
+      if (performance.now() - lastPointer.t < 900) return lastPointer;
+      const a = document.activeElement;
+      if (a && a !== document.body) {
+        const r = a.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      }
+      return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    }
+
     function setTint(rgb) {
-      if (rgb) show(lift(rgb), STREAKS.active);
-      else show(STREAKS.color, STREAKS.idle);
+      const next = rgb ? lift(rgb) : STREAKS.color;
+      const strength = rgb ? STREAKS.active : STREAKS.idle;
+      const changed = keyOf(next, strength) !== keyOf(current.rgb, current.strength);
+      show(next, strength);
+      if (changed) { const o = originPoint(); pour(o.x, o.y, next, rgb ? 1 : 0.6, 'pour'); }
+    }
+
+    // scroll speed steers the light
+    let sLastY = window.scrollY, sLastT = performance.now();
+    window.addEventListener('scroll', () => {
+      const t = performance.now(), y = window.scrollY;
+      const v = (y - sLastY) / Math.max(8, t - sLastT) * 1000;
+      scrollVel = scrollVel * 0.5 + v * 0.5;
+      sLastY = y; sLastT = t;
+    }, { passive: true });
+
+    // hovering a project card previews its colour in the light and sends a pour along the nearest ribbon
+    if (window.matchMedia('(hover: hover)').matches && !reduced) {
+      let hoverCard = null, lastHoverPour = 0;
+      document.addEventListener('pointerover', e => {
+        const card = e.target.closest && e.target.closest('.project-card');
+        if (!card || card === hoverCard || document.querySelector('.drawer-overlay.open')) return;
+        hoverCard = card;
+        const rgb = toRGB(card.style.getPropertyValue('--accent'));
+        if (!rgb) return;
+        hoverRGB = lift(rgb);
+        const now = performance.now();
+        if (now - lastHoverPour > 700) { lastHoverPour = now; pour(e.clientX, e.clientY, hoverRGB, 0.7, 'hover'); }
+      }, { passive: true });
+      document.addEventListener('pointerout', e => {
+        if (!hoverCard) return;
+        const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.project-card');
+        if (!to) { hoverCard = null; hoverRGB = null; }
+      }, { passive: true });
+    }
+
+    // changing page: light rushes down the ribbons as the content fades, and again as the next page arrives
+    if (!reduced) {
+      let leaving = false;
+      new MutationObserver(() => {
+        const now = document.body.classList.contains('page-leaving');
+        if (now && !leaving) surge('out');
+        leaving = now;
+      }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
 
     // build a focus-area colour ahead of time (hover, idle) without showing it
@@ -726,6 +1012,7 @@
 
     function setup() {
       geo = buildGeo();
+      pulses.length = 0;
       lastDims = { W: geo.d.W, H: geo.d.H };
       clearBases();
       sizeFlow();
@@ -734,7 +1021,7 @@
     }
     setup();
     warmPageColours();
-    if (STREAKS.flow && !reduced) requestAnimationFrame(tickFlow);
+    if (STREAKS.flow && !reduced) { requestAnimationFrame(tickFlow);}
 
     // rebuild when the window really changes size, or the theme flips
     let rt = 0;
@@ -764,7 +1051,7 @@
         my = e.clientY / window.innerHeight - 0.5;
         queue();
       }, { passive: true });
-      window.addEventListener('scroll', () => { sy = Math.min(window.scrollY * 0.05, 60); queue(); }, { passive: true });
+      window.addEventListener('scroll', () => { sy = Math.max(0, Math.min(window.scrollY * 0.05, window.innerHeight * 0.03 - STREAKS.parallax * 0.5 - 6)); queue(); }, { passive: true });
     }
 
     bindTintSources(setTint);

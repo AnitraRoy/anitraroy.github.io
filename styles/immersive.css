@@ -594,10 +594,10 @@ html.fx-streaks .entry-list {
 .rail {
   padding: 1.1rem 1.2rem;
   border-radius: 14px;
-  background: color-mix(in oklch, var(--bg) 2.5%, transparent);
-  border: 1px solid color-mix(in oklch, var(--border) 2.5%, transparent);
-  -webkit-backdrop-filter: blur(1.5px) saturate(1.1);
-          backdrop-filter: blur(1.5px) saturate(1.1);
+  background: color-mix(in oklch, var(--bg) 3.5%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 3.5%, transparent);
+  -webkit-backdrop-filter: blur(1.75px) saturate(1.1);
+          backdrop-filter: blur(1.75px) saturate(1.1);
 }
 
 /* slightly heavier, brighter labels inside it */
